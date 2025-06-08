@@ -6,10 +6,14 @@ import { PromptRole } from '@/models/debug'
 export let apiPrefix = ''
 export let publicApiPrefix = ''
 
+export let authWay: string = ''
+
 // NEXT_PUBLIC_API_PREFIX=/console/api NEXT_PUBLIC_PUBLIC_API_PREFIX=/api npm run start
 if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX) {
   apiPrefix = process.env.NEXT_PUBLIC_API_PREFIX
   publicApiPrefix = process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX
+  // 判断是否在福诺运行
+  authWay = process.env.NEXT_PUBLIC_AUTH_WAY as string
 }
 else if (
   globalThis.document?.body?.getAttribute('data-api-prefix')
@@ -18,6 +22,8 @@ else if (
   // Not build can not get env from process.env.NEXT_PUBLIC_ in browser https://nextjs.org/docs/basic-features/environment-variables#exposing-environment-variables-to-the-browser
   apiPrefix = globalThis.document.body.getAttribute('data-api-prefix') as string
   publicApiPrefix = globalThis.document.body.getAttribute('data-pubic-api-prefix') as string
+ // 判断是否在福诺运行
+  authWay = globalThis.document.body.getAttribute('data-public-auth-way') as string
 }
 else {
   // const domainParts = globalThis.location?.host?.split('.');
@@ -25,7 +31,11 @@ else {
   // const env = domainParts.length === 2 ? 'ai' : domainParts?.[0];
   apiPrefix = 'http://localhost:5001/console/api'
   publicApiPrefix = 'http://localhost:5001/api' // avoid browser private mode api cross origin
+// 默认非福诺
+  authWay = 'SIGN'
 }
+// 导出环境判断
+export const AUTH_WAY: string = authWay
 
 export const API_PREFIX: string = apiPrefix
 export const PUBLIC_API_PREFIX: string = publicApiPrefix

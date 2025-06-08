@@ -43,6 +43,8 @@ import { publishWorkflow } from '@/service/workflow'
 import { ArrowNarrowLeft } from '@/app/components/base/icons/src/vender/line/arrows'
 import { useFeatures } from '@/app/components/base/features/hooks'
 
+import {AUTH_WAY } from '@/config'
+
 const Header: FC = () => {
   const { t } = useTranslation()
   const workflowStore = useWorkflowStore()
@@ -180,7 +182,7 @@ const Header: FC = () => {
               <RiApps2AddLine className='w-4 h-4 mr-1 text-components-button-secondary-text' />
               {t('workflow.common.features')}
             </Button>
-            <AppPublisher
+           { AUTH_WAY === 'SIGN' && <AppPublisher
               {...{
                 publishedAt,
                 draftUpdatedAt,
@@ -193,7 +195,7 @@ const Header: FC = () => {
                 onToggle: onPublisherToggle,
                 crossAxisOffset: 4,
               }}
-            />
+            /> } 
           </div>
         )
       }

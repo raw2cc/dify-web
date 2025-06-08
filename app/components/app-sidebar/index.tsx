@@ -11,6 +11,8 @@ import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import { useStore as useAppStore } from '@/app/components/app/store'
 import cn from '@/utils/classnames'
 
+import {AUTH_WAY } from '@/config'
+
 export type IAppDetailNavProps = {
   iconType?: 'app' | 'dataset' | 'notion'
   title: string
@@ -28,6 +30,9 @@ export type IAppDetailNavProps = {
 }
 
 const AppDetailNav = ({ title, desc, isExternal, icon, icon_background, navigation, extraInfo, iconType = 'app' }: IAppDetailNavProps) => {
+  
+  if (AUTH_WAY !== 'SIGN') return null
+
   const { appSidebarExpand, setAppSiderbarExpand } = useAppStore(useShallow(state => ({
     appSidebarExpand: state.appSidebarExpand,
     setAppSiderbarExpand: state.setAppSiderbarExpand,

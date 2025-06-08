@@ -2,6 +2,7 @@
 import { usePathname } from 'next/navigation'
 import s from './index.module.css'
 import classNames from '@/utils/classnames'
+import {AUTH_WAY } from '@/config'
 
 type HeaderWrapperProps = {
   children: React.ReactNode
@@ -10,6 +11,9 @@ type HeaderWrapperProps = {
 const HeaderWrapper = ({
   children,
 }: HeaderWrapperProps) => {
+
+  if (AUTH_WAY !== 'SIGN') return null
+
   const pathname = usePathname()
   const isBordered = ['/apps', '/datasets', '/datasets/create', '/tools'].includes(pathname)
 

@@ -6,6 +6,7 @@ import type {
 import { useLanguage } from '../hooks'
 import { CubeOutline } from '@/app/components/base/icons/src/vender/line/shapes'
 import { OpenaiViolet } from '@/app/components/base/icons/src/public/llm'
+import { API_PREFIX, AUTH_WAY } from '@/config'
 
 type ModelIconProps = {
   provider?: Model | ModelProvider
@@ -23,10 +24,11 @@ const ModelIcon: FC<ModelIconProps> = ({
     return <OpenaiViolet className={`w-4 h-4 ${className}`}/>
 
   if (provider?.icon_small) {
+     const baseUrl = AUTH_WAY !== 'SIGN' ? API_PREFIX.replace('/console/api', '') : ''
     return (
       <img
         alt='model-icon'
-        src={`${provider.icon_small[language] || provider.icon_small.en_US}`}
+        src={` ${baseUrl}${provider.icon_small[language] || provider.icon_small.en_US}`}
         className={`w-4 h-4 ${className}`}
       />
     )
