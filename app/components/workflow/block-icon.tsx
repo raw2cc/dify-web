@@ -21,6 +21,8 @@ import {
 } from '@/app/components/base/icons/src/vender/workflow'
 import AppIcon from '@/app/components/base/app-icon'
 
+import { API_PREFIX, AUTH_WAY } from '@/config'
+
 type BlockIconProps = {
   type: BlockEnum
   size?: string
@@ -80,6 +82,8 @@ const BlockIcon: FC<BlockIconProps> = ({
   className,
   toolIcon,
 }) => {
+  const baseUrl = AUTH_WAY !== 'SIGN' ? API_PREFIX.replace('/console/api', '') : ''
+
   return (
     <div className={`
       flex items-center justify-center border-[0.5px] border-white/2 text-white
@@ -103,7 +107,7 @@ const BlockIcon: FC<BlockIconProps> = ({
                   <div
                     className='shrink-0 w-full h-full bg-cover bg-center rounded-md'
                     style={{
-                      backgroundImage: `url(${toolIcon})`,
+                      backgroundImage: `url(${baseUrl}${toolIcon})`,
                     }}
                   ></div>
                 )

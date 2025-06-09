@@ -2,7 +2,7 @@
 import { usePathname } from 'next/navigation'
 import s from './index.module.css'
 import classNames from '@/utils/classnames'
-import {AUTH_WAY } from '@/config'
+import { AUTH_WAY } from '@/config'
 
 type HeaderWrapperProps = {
   children: React.ReactNode
