@@ -8,11 +8,13 @@ import { CodeLanguage } from '@/app/components/workflow/nodes/code/types'
 import {
   getFilesInLogs,
 } from '@/app/components/base/file-uploader/utils'
+import { API_PREFIX } from '@/config'
 
 import './style.css'
 
 // load file from local instead of cdn https://github.com/suren-atoyan/monaco-react/issues/482
-loader.config({ paths: { vs: '/vs' } })
+const path = API_PREFIX.replace('/console/api', '')
+loader.config({ paths: { vs: `${path}/vs` } })
 
 const CODE_EDITOR_LINE_HEIGHT = 18
 

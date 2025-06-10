@@ -355,22 +355,39 @@ const baseFetch = <T>(
     const accessToken = getAccessToken(isPublicAPI);
     options.headers.set("Authorization", `Bearer ${accessToken}`);
   }
+
+  if (isPublicAPI) {
+    const sharedToken = globalThis.location.pathname.split('/').slice(-1)[0]
+    const accessToken = localStorage.getItem('token') || JSON.stringify({ [sharedToken]: '' })
+    let accessTokenJson = { [sharedToken]: '' }
+    try {
+      accessTokenJson = JSON.parse(accessToken)
+    }
+    catch (e) {
+
+    }
+    options.headers.set('Authorization', `Bearer ${accessTokenJson[sharedToken]}`)
+  }
+  else {
+    const accessToken = localStorage.getItem('console_token') || ''
+    options.headers.set('Authorization', `Bearer ${accessToken}`)
+  }
   // 福诺请求头
-  if (AUTH_WAY === "FUNUO") {
+  if (AUTH_WAY === 'FUNUO') {
     const base = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
-    url += `${url.includes("?") ? "&" : "?"}_t=${new Date().getTime()}`;
+    url += `${url.includes('?') ? '&' : '?'}_t=${new Date().getTime()}`;
     const axiosOptions = {
       baseURL: base,
       url,
       method: options.method,
-    };
+    }
     const requestUrl = getRequestUrl(axiosOptions);
-    if (requestUrl) options.headers.set("Request-Url", requestUrl);
+    if (requestUrl) options.headers.set('Request-Url', requestUrl)
     if (getLsToken()) {
-      const authorization = getAuthHeader(axiosOptions);
-      if (authorization) options.headers.set("Authorization", authorization);
-      const curTenantId = window.localStorage.getItem("curTenantId");
-      if (curTenantId) options.headers.set("TenantId", curTenantId);
+      const authorization = getAuthHeader(axiosOptions)
+      if (authorization) options.headers.set("Authorization", authorization)
+      const curTenantId = window.localStorage.getItem("curTenantId")
+      if (curTenantId) options.headers.set("TenantId", curTenantId)
     }
   }
 
@@ -550,7 +567,14 @@ export const ssePost = (
 
   getAbortController?.(abortController);
 
-  const urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
+  let urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
+
+  const portalUrl = ['/messages/send', 'messages/send']
+  if (AUTH_WAY === "FUNUO" && portalUrl.includes(url.split('?')[0])) {
+    urlPrefix = urlPrefix.replace('/proxy/console/api', '')
+    options.headers.set('Accept', 'text/event-stream')
+  }
+
   const urlWithPrefix =
     url.startsWith("http://") || url.startsWith("https://")
       ? url

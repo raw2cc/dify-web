@@ -26,6 +26,7 @@ import {
 } from '@/app/components/base/file-uploader/utils'
 import { ErrorHandleTypeEnum } from '@/app/components/workflow/nodes/_base/components/error-handle/types'
 import type { NodeTracing, VersionHistory } from '@/types/workflow'
+import { AUTH_WAY } from '@/config'
 
 export const useWorkflowRun = () => {
   const store = useStoreApi()
@@ -127,10 +128,10 @@ export const useWorkflowRun = () => {
 
     let url = ''
     if (appDetail?.mode === 'advanced-chat')
-      url = `/apps/${appDetail.id}/advanced-chat/workflows/draft/run`
+      url = AUTH_WAY === 'SIGN' ? `/apps/${appDetail.id}/advanced-chat/workflows/draft/run` : `/messages/send?appId=${appDetail.id}`
 
     if (appDetail?.mode === 'workflow')
-      url = `/apps/${appDetail.id}/workflows/draft/run`
+      url = AUTH_WAY === 'SIGN' ? `/apps/${appDetail.id}/workflows/draft/run` : `/messages/send?appId=${appDetail.id}`
 
     let prevNodeId = ''
 
@@ -158,7 +159,8 @@ export const useWorkflowRun = () => {
         ttsUrl = `/apps/${params.appId}/text-to-audio`
     }
     const player = AudioPlayerManager.getInstance().getAudioPlayer(ttsUrl, ttsIsPublic, uuidV4(), 'none', 'none', (_: any): any => {})
-
+    params.clientType = 'PORTAL'
+    params.invokeFromEnum = 'DEBUGGER'
     ssePost(
       url,
       {
