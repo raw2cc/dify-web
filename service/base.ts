@@ -226,10 +226,10 @@ const handleStream = (
       const lines = buffer.split("\n");
       try {
         lines.forEach((message) => {
-          if (message.startsWith("data: ")) {
+          if (message.startsWith("data:")) {
             // check if it starts with data:
             try {
-              bufferObj = JSON.parse(message.substring(6)) as Record<
+              bufferObj = JSON.parse(message.substring(5)) as Record<
                 string,
                 any
               >; // remove data: and parse as json
