@@ -345,7 +345,6 @@ const baseFetch = <T>(
     fetchOptions
   );
 
-
   if (AUTH_WAY === "SIGN") {
     if (getAbortController) {
       const abortController = new AbortController();
@@ -357,38 +356,42 @@ const baseFetch = <T>(
   }
 
   if (isPublicAPI) {
-    const sharedToken = globalThis.location.pathname.split('/').slice(-1)[0]
-    const accessToken = localStorage.getItem('token') || JSON.stringify({ [sharedToken]: '' })
-    let accessTokenJson = { [sharedToken]: '' }
+    const sharedToken = globalThis.location.pathname.split("/").slice(-1)[0];
+    const accessToken =
+      localStorage.getItem("token") || JSON.stringify({ [sharedToken]: "" });
+    let accessTokenJson = { [sharedToken]: "" };
     try {
-      accessTokenJson = JSON.parse(accessToken)
-    }
-    catch (e) {
-
-    }
-    options.headers.set('Authorization', `Bearer ${accessTokenJson[sharedToken]}`)
-  }
-  else {
-    const accessToken = localStorage.getItem('console_token') || ''
-    options.headers.set('Authorization', `Bearer ${accessToken}`)
+      accessTokenJson = JSON.parse(accessToken);
+    } catch (e) {}
+    options.headers.set(
+      "Authorization",
+      `Bearer ${accessTokenJson[sharedToken]}`
+    );
+  } else {
+    const accessToken = localStorage.getItem("console_token") || "";
+    options.headers.set("Authorization", `Bearer ${accessToken}`);
   }
   // 福诺请求头
-  if (AUTH_WAY === 'FUNUO') {
+  if (AUTH_WAY === "FUNUO") {
     const base = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
-    url += `${url.includes('?') ? '&' : '?'}_t=${new Date().getTime()}`;
+    url += `${url.includes("?") ? "&" : "?"}_t=${new Date().getTime()}`;
     const axiosOptions = {
       baseURL: base,
       url,
       method: options.method,
-    }
+    };
     const requestUrl = getRequestUrl(axiosOptions);
-    if (requestUrl) options.headers.set('Request-Url', requestUrl)
+    if (requestUrl) options.headers.set("Request-Url", requestUrl);
     if (getLsToken()) {
-      const authorization = getAuthHeader(axiosOptions)
-      if (authorization) options.headers.set("Authorization", authorization)
-      const curTenantId = window.localStorage.getItem("curTenantId")
-      if (curTenantId) options.headers.set("TenantId", curTenantId)
+      const authorization = getAuthHeader(axiosOptions);
+      if (authorization) options.headers.set("Authorization", authorization);
+      const curTenantId = window.localStorage.getItem("curTenantId");
+      if (curTenantId) options.headers.set("TenantId", curTenantId);
     }
+    const portalUrl = ["/messages/send", "messages/send"];
+    if (portalUrl.includes(url.split("?")[0]))
+      options.headers.set("Accept", "text/event-stream");
+    else options.headers.set("Accept", "*/*");
   }
 
   if (deleteContentType) {
@@ -569,10 +572,12 @@ export const ssePost = (
 
   let urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
 
-  const portalUrl = ['/messages/send', 'messages/send']
-  if (AUTH_WAY === "FUNUO" && portalUrl.includes(url.split('?')[0])) {
-    urlPrefix = urlPrefix.replace('/proxy/console/api', '')
-    options.headers.set('Accept', 'text/event-stream')
+  const portalUrl = ["/messages/send", "messages/send"];
+  if (AUTH_WAY === "FUNUO" && portalUrl.includes(url.split("?")[0])) {
+    urlPrefix = urlPrefix.replace("/proxy/console/api", "");
+    options.headers.set("Accept", "text/event-stream");
+  } else {
+    options.headers.set("Accept", "*/*");
   }
 
   const urlWithPrefix =
@@ -582,11 +587,11 @@ export const ssePost = (
 
   const { body } = options;
   if (body) options.body = JSON.stringify(body);
-  if(AUTH_WAY === "SIGN"){
-     const accessToken = getAccessToken(isPublicAPI);
-     options.headers.set("Authorization", `Bearer ${accessToken}`);
+  if (AUTH_WAY === "SIGN") {
+    const accessToken = getAccessToken(isPublicAPI);
+    options.headers.set("Authorization", `Bearer ${accessToken}`);
   }
-    // 福诺请求头
+  // 福诺请求头
   if (AUTH_WAY === "FUNUO") {
     const base = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
     url += `${url.includes("?") ? "&" : "?"}_t=${new Date().getTime()}`;
