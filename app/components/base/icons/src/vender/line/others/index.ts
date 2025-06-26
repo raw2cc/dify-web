@@ -10,3 +10,5 @@ export { default as Icon3Dots } from './Icon3Dots'
 export { default as LongArrowLeft } from './LongArrowLeft'
 export { default as LongArrowRight } from './LongArrowRight'
 export { default as Tools } from './Tools'
+
+export { default as SearchIcon } from './SearchIcon'

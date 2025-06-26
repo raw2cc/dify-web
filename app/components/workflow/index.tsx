@@ -96,6 +96,8 @@ import Confirm from '@/app/components/base/confirm'
 import { FILE_EXTS } from '@/app/components/base/prompt-editor/constants'
 import { fetchFileUploadConfig } from '@/service/common'
 
+import AppSideBar from '@/app/components/app-sidebar/add-node'
+
 const nodeTypes = {
   [CUSTOM_NODE]: CustomNode,
   [CUSTOM_NOTE_NODE]: CustomNoteNode,
@@ -275,8 +277,13 @@ const Workflow: FC<WorkflowProps> = memo(({
       console.warn(message)
     }
   }
+  const [expand, setExpand] = useState(true)
 
   return (
+    <div className={`w-full relative h-full overflow-x-auto ${expand ? 'pl-[216px]' : 'pl-[72px]'}`}>
+      <div className='h-full absolute z-1 left-0'>
+        <AppSideBar changeExpand={setExpand}/>
+      </div>
     <div
       id='workflow-container'
       className={`
@@ -375,6 +382,7 @@ const Workflow: FC<WorkflowProps> = memo(({
           color='var(--color-workflow-canvas-workflow-dot-color)'
         />
       </ReactFlow>
+    </div>
     </div>
   )
 })
