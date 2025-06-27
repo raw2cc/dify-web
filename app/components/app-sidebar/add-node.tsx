@@ -57,7 +57,7 @@ const AppDetailNav = ({ changeExpand }: IAppDetailNavProps) => {
       zIndex: 10,
     })
     workflowStore.setState({
-      candidateNode: newNode,
+      candidateNode: newNode?.newNode,
     })
   }, [store, workflowStore, t])
 

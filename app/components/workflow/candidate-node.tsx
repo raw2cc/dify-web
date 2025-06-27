@@ -32,7 +32,6 @@ const CandidateNode = () => {
 
   useEventListener('click', (e) => {
     const { candidateNode, mousePosition } = workflowStore.getState()
-
     if (candidateNode) {
       e.preventDefault()
       const {
