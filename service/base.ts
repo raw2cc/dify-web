@@ -696,6 +696,15 @@ export const ssePost = (
     });
 };
 
+const callback403 = (loginUrl) => {
+  if (AUTH_WAY === "SIGN") {
+    globalThis.location.href = loginUrl;
+  } else {
+    // 刷新上级页面
+    globalThis?.top?.location?.reload()
+  }
+};
+
 // base request
 export const request = async <T>(
   url: string,
@@ -715,7 +724,7 @@ export const request = async <T>(
       );
       const loginUrl = `${globalThis.location.origin}/signin`;
       if (parseErr) {
-        globalThis.location.href = loginUrl;
+        callback403(loginUrl);
         return Promise.reject(err);
       }
       // special code
@@ -757,14 +766,14 @@ export const request = async <T>(
       if (refreshErr === null)
         return baseFetch<T>(url, options, otherOptionsForBaseFetch);
       if (location.pathname !== "/signin" || !IS_CE_EDITION) {
-        globalThis.location.href = loginUrl;
+       callback403(loginUrl);
         return Promise.reject(err);
       }
       if (!silent) {
         Toast.notify({ type: "error", message });
         return Promise.reject(err);
       }
-      globalThis.location.href = loginUrl;
+      callback403(loginUrl);
       return Promise.reject(err);
     } else {
       return Promise.reject(err);

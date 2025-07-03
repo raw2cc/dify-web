@@ -47,6 +47,7 @@ const LocaleLayout = ({
         data-public-top-k-max-value={process.env.NEXT_PUBLIC_TOP_K_MAX_VALUE}
         data-public-indexing-max-segmentation-tokens-length={process.env.NEXT_PUBLIC_INDEXING_MAX_SEGMENTATION_TOKENS_LENGTH}
         data-public-auth-way={process.env.NEXT_PUBLIC_AUTH_WAY}
+        data-public-public-path={process.env.NEXT_PUBLIC_PUBLIC_PATH}
       >
         <BrowserInitor>
           <SentryInitor>

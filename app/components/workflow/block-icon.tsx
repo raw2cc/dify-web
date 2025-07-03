@@ -21,7 +21,7 @@ import {
 } from '@/app/components/base/icons/src/vender/workflow'
 import AppIcon from '@/app/components/base/app-icon'
 
-import { API_PREFIX, AUTH_WAY } from '@/config'
+import { AUTH_WAY, PUBLIC_PATH } from '@/config'
 
 type BlockIconProps = {
   type: BlockEnum
@@ -82,8 +82,7 @@ const BlockIcon: FC<BlockIconProps> = ({
   className,
   toolIcon,
 }) => {
-  const baseUrl = AUTH_WAY !== 'SIGN' ? API_PREFIX.replace('/console/api', '') : ''
-
+  const baseUrl = AUTH_WAY !== 'SIGN' ? `${PUBLIC_PATH}/ai-portal/proxy` : ''
   return (
     <div className={`
       flex items-center justify-center border-[0.5px] border-white/2 text-white

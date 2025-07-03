@@ -13,6 +13,7 @@ import type { ICurrentWorkspace, LangGeniusVersionResponse, UserProfileResponse 
 import MaintenanceNotice from '@/app/components/header/maintenance-notice'
 import type { SystemFeatures } from '@/types/feature'
 import { defaultSystemFeatures } from '@/types/feature'
+import { AUTH_WAY } from '@/config'
 
 export type AppContextValue = {
   theme: Theme
@@ -113,8 +114,11 @@ export const AppContextProvider: FC<AppContextProviderProps> = ({ children }) =>
       setUserProfile(result)
       const current_version = userProfileResponse.headers.get('x-version')
       const current_env = process.env.NODE_ENV === 'development' ? 'DEVELOPMENT' : userProfileResponse.headers.get('x-env')
-      const versionData = await fetchLanggeniusVersion({ url: '/version', params: { current_version } })
-      setLangeniusVersionInfo({ ...versionData, current_version, latest_version: versionData.version, current_env })
+      // 不在dify环境运行不用更新版本
+      if (AUTH_WAY === 'SIGN') {
+        const versionData = await fetchLanggeniusVersion({ url: '/version', params: { current_version } })
+        setLangeniusVersionInfo({ ...versionData, current_version, latest_version: versionData.version, current_env })
+      }
     }
   }, [userProfileResponse])
 
