@@ -17,8 +17,8 @@ const TipPopup = ({
       offset={4}
       popupClassName='p-0 bg-transparent'
       popupContent={
-        <div className='flex items-center gap-1 p-1.5 backdrop-blur-[5px] shadow-lg rounded-lg border-[0.5px] border-components-panel-border bg-components-tooltip-bg'>
-          <span className='system-xs-medium text-text-secondary'>{title}</span>
+        <div className='flex items-center gap-1 p-1.5 backdrop-blur-[5px] shadow-lg rounded-lg'>
+          <span className=''>{title}</span>
           {
             shortcuts && <ShortcutsName keys={shortcuts} />
           }

@@ -9,6 +9,7 @@ import {
   Handle,
   Position,
 } from 'reactflow'
+import { useSearchParams } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import {
   BlockEnum,
@@ -47,20 +48,23 @@ export const NodeTargetHandle = memo(({
   const [open, setOpen] = useState(false)
   const { handleNodeAdd } = useNodesInteractions()
   const { getNodesReadOnly } = useNodesReadOnly()
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
   const connected = data._connectedTargetHandleIds?.includes(handleId)
   const { availablePrevBlocks } = useAvailableBlocks(data.type, data.isInIteration)
-  const isConnectable = !!availablePrevBlocks.length
+  const isConnectable = !!availablePrevBlocks.length && !isOnlyView
   const [toolModalOpen, setToolModalOpen] = useState(false) // 添加状态控制弹框
   const [toolModalType, setToolModalType] = useState<'workflow' | 'toolbox' | ''>('')
-
   const handleOpenChange = useCallback((v: boolean) => {
     setOpen(v)
   }, [])
   const handleHandleClick = useCallback((e: MouseEvent) => {
     e.stopPropagation()
+    if (isOnlyView)
+      return
     if (!connected)
       setOpen(v => !v)
-  }, [connected])
+  }, [connected, isOnlyView])
   const handleSelect = useCallback((type: BlockEnum, toolDefaultValue?: ToolDefaultValue) => {
     // 当节点类型为 workflow,toolbox 时，显示弹框而不是创建节点
     if (type === 'workflow' || type === 'toolbox') {
@@ -101,7 +105,7 @@ export const NodeTargetHandle = memo(({
         onClick={handleHandleClick}
       >
         {
-          !connected && isConnectable && !getNodesReadOnly() && (
+          !connected && isConnectable && !getNodesReadOnly() && !isOnlyView && (
             <BlockSelector
               open={open}
               onOpenChange={handleOpenChange}
@@ -143,8 +147,10 @@ export const NodeSourceHandle = memo(({
   const [open, setOpen] = useState(false)
   const { handleNodeAdd } = useNodesInteractions()
   const { getNodesReadOnly, isView } = useNodesReadOnly()
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
   const { availableNextBlocks } = useAvailableBlocks(data.type, data.isInIteration)
-  const isConnectable = !!availableNextBlocks.length
+  const isConnectable = !!availableNextBlocks.length && !isOnlyView
   const isChatMode = useIsChatMode()
   const { checkParallelLimit } = useWorkflow()
   const [toolModalOpen, setToolModalOpen] = useState(false) // 添加状态控制弹框
@@ -155,9 +161,11 @@ export const NodeSourceHandle = memo(({
   }, [])
   const handleHandleClick = useCallback((e: MouseEvent) => {
     e.stopPropagation()
+    if (isOnlyView)
+      return
     if (checkParallelLimit(id, handleId))
       setOpen(v => !v)
-  }, [checkParallelLimit, id, handleId])
+  }, [checkParallelLimit, id, handleId, isOnlyView])
   const handleSelect = useCallback((type: BlockEnum, toolDefaultValue?: ToolDefaultValue) => {
     // 当节点类型为 workflow,toolbox 时，显示弹框而不是创建节点
     if (type === 'workflow' || type === 'toolbox') {
@@ -200,7 +208,7 @@ export const NodeSourceHandle = memo(({
       isConnectable={isConnectable}
       onClick={handleHandleClick}
     >
-      <div style={{ display: isView ? 'none' : '' }} className='hidden group-hover/handle:block absolute left-1/2 -top-1 -translate-y-full -translate-x-1/2 p-1.5 border-[0.5px] border-components-panel-border bg-components-tooltip-bg rounded-lg shadow-lg'>
+      <div style={{ display: (isView || isOnlyView) ? 'none' : '' }} className='hidden group-hover/handle:block absolute left-1/2 -top-1 -translate-y-full -translate-x-1/2 p-1.5 border-[0.5px] border-components-panel-border bg-components-tooltip-bg rounded-lg shadow-lg'>
         <div className='system-xs-regular text-text-tertiary'>
           <div className=' whitespace-nowrap'>
             <span className='system-xs-medium text-text-secondary'>{t('workflow.common.parallelTip.click.title')}</span>
@@ -213,7 +221,7 @@ export const NodeSourceHandle = memo(({
         </div>
       </div>
       {
-        isConnectable && !getNodesReadOnly() && (
+        isConnectable && !getNodesReadOnly() && !isOnlyView && (
           <BlockSelector
             open={open}
             onOpenChange={handleOpenChange}

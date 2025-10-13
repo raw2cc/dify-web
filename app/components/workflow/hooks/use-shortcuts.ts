@@ -1,6 +1,7 @@
 import { useReactFlow } from 'reactflow'
 import { useKeyPress } from 'ahooks'
 import { useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   getKeyboardKeyCodeBySystem,
   isEventTargetInputArea,
@@ -60,8 +61,12 @@ export const useShortcuts = (): void => {
     const { showFeaturesPanel } = workflowStore.getState()
     return !showFeaturesPanel && !isEventTargetInputArea(e.target as HTMLElement)
   }, [workflowStore])
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
 
   useKeyPress(['delete', 'backspace'], (e) => {
+    if (isOnlyView)
+      return
     if (shouldHandleShortcut(e)) {
       e.preventDefault()
       handleNodesDelete()

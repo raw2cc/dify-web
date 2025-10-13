@@ -243,10 +243,10 @@ const Editor: FC<Props> = ({
                             title: t('workflow.blocks.start'),
                             type: BlockEnum.Start,
                           }
-                          acc.start_query = {
-                            title: t('workflow.blocks.start'),
-                            type: BlockEnum.Start,
-                          }
+                          // acc.start_query = {
+                          //   title: t('workflow.blocks.start'),
+                          //   type: BlockEnum.Start,
+                          // }
                         }
                         return acc
                       }, {} as any),

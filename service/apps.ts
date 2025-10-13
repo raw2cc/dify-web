@@ -37,7 +37,7 @@ export const copyApp: Fetcher<AppDetailResponse, { appID: string; name: string; 
 }
 
 export const exportAppConfig: Fetcher<{ data: string }, { appID: string; include?: boolean }> = ({ appID, include = false }) => {
-  return get<{ data: string }>(`apps/${appID}/export?include_secret=${include}`)
+  return get<{ data: string }>(`app-main/apps/${appID}/export?include_secret=${include}`)
 }
 
 // TODO: delete

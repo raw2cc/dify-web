@@ -4,6 +4,7 @@ import {
   useRef,
 } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'next/navigation'
 import { useClickAway } from 'ahooks'
 import Divider from '../base/divider'
 import ShortcutsName from './shortcuts-name'
@@ -29,6 +30,8 @@ const PanelContextmenu = () => {
   const { handleStartWorkflowRun } = useWorkflowStartRun()
   const { handleAddNote } = useOperator()
   const { exportCheck } = useDSL()
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
 
   useEffect(() => {
     if (panelMenu)
@@ -117,12 +120,12 @@ const PanelContextmenu = () => {
         >
           {t('app.export')}
         </div>
-        <div
+        {!isOnlyView && <div
           className='flex items-center justify-between px-3 h-8 text-sm text-text-secondary rounded-lg cursor-pointer hover:bg-state-base-hover'
           onClick={() => setShowImportDSLModal(true)}
         >
           {t('workflow.common.importDSL')}
-        </div>
+        </div>}
       </div>
     </div>
   )

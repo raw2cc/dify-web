@@ -6,6 +6,7 @@ import {
 } from 'react'
 import { intersection } from 'lodash-es'
 import type { EdgeProps } from 'reactflow'
+import { useSearchParams } from 'next/navigation'
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -65,6 +66,8 @@ const CustomEdge = ({
   } = data
   const [toolModalOpen, setToolModalOpen] = useState(false) // 添加状态控制弹框
   const [toolModalType, setToolModalType] = useState<'workflow' | 'toolbox' | ''>('')
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
   const linearGradientId = useMemo(() => {
     if (
       (
@@ -160,14 +163,14 @@ const CustomEdge = ({
             opacity: data._waitingRun ? 0.7 : 1,
           }}
         >
-          <BlockSelector
+          {!isOnlyView && <BlockSelector
             open={open}
             onOpenChange={handleOpenChange}
             asChild
             onSelect={handleInsert}
             availableBlocksTypes={intersection(availablePrevBlocks, availableNextBlocks)}
             triggerClassName={() => 'hover:scale-150 transition-all'}
-          />
+          />}
         </div>
         <ToolModal open={toolModalOpen} onSelect={handleInsert}
           onCancel={() => {

@@ -402,7 +402,10 @@ const baseFetch = <T>(
     if (!contentType) options.headers.set("Content-Type", ContentType.json);
   }
 
-  const urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
+  let urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
+  // 如果是调用自己后端接口，则去掉proxy/console/api
+  if (url.includes('export?include_secret'))
+    urlPrefix = urlPrefix.replace('/proxy/console/api', '')
   let urlWithPrefix =
     url.startsWith("http://") || url.startsWith("https://")
       ? url

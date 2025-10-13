@@ -19,6 +19,7 @@ import {
   DELETE_WORKFLOW_VARIABLE_BLOCK_COMMAND,
   UPDATE_WORKFLOW_NODES_MAP,
 } from './index'
+import { BlockEnum } from '@/app/components/workflow/types'
 import cn from '@/utils/classnames'
 import { Variable02 } from '@/app/components/base/icons/src/vender/solid/development'
 import { BubbleX, Env } from '@/app/components/base/icons/src/vender/line/others'
@@ -50,7 +51,22 @@ const WorkflowVariableBlockComponent = ({
       return `${isSystem ? 'sys.' : ''}${varName}`
     }
   )()
-  const [localWorkflowNodesMap, setLocalWorkflowNodesMap] = useState<WorkflowNodesMap>(workflowNodesMap)
+  const [localWorkflowNodesMap, setLocalWorkflowNodesMap] = useState<WorkflowNodesMap>(() => {
+    // 检查 workflowNodesMap 是否包含 start_query
+    if (!workflowNodesMap.start_query) {
+      // 如果不包含，则添加 start_query
+      return {
+        ...workflowNodesMap,
+        start_query: {
+          title: t('workflow.blocks.start'),
+          type: BlockEnum.Start,
+        },
+      }
+    }
+    // 如果已经包含，则直接使用 workflowNodesMap
+    return workflowNodesMap
+  })
+
   const node = localWorkflowNodesMap![variables[0]]
   // console.log('node111', variables, node)
   const isEnv = isENV(variables)
@@ -65,6 +81,16 @@ const WorkflowVariableBlockComponent = ({
       editor.registerCommand(
         UPDATE_WORKFLOW_NODES_MAP,
         (workflowNodesMap: WorkflowNodesMap) => {
+          // 更新时检查并添加 start_query
+          if (!workflowNodesMap?.start_query) {
+            workflowNodesMap = {
+              ...workflowNodesMap,
+              start_query: {
+                title: t('workflow.blocks.start'),
+                type: BlockEnum.Start,
+              },
+            }
+          }
           setLocalWorkflowNodesMap(workflowNodesMap)
 
           return true

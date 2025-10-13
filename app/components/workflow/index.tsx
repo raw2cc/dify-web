@@ -185,6 +185,7 @@ const Workflow: FC<WorkflowProps> = memo(({
   let getting = false
   const searchParams = useSearchParams()
   const conversationId = searchParams.get('conversationId')
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
 
   function timeoutFn() {
     if (!getting) {
@@ -314,12 +315,12 @@ const Workflow: FC<WorkflowProps> = memo(({
   const [expand, setExpand] = useState(true)
 
   const hasSidebarPadding = expand ? 'pl-[216px]' : 'pl-[72px]'
-  const paddingLeft = isView ? 'pl-0' : hasSidebarPadding
+  const paddingLeft = (isView || isOnlyView) ? 'pl-0' : hasSidebarPadding
 
   return (
     <div className={`w-full relative h-full overflow-x-auto ${paddingLeft}`}>
       {/* 查看时隐藏侧边栏 */}
-      {!isView && <div className='h-full absolute z-1 left-0'>
+      {!isView && !isOnlyView && <div className='h-full absolute z-1 left-0'>
         <AppSideBar changeExpand={setExpand}/>
       </div>
       }
@@ -335,11 +336,11 @@ const Workflow: FC<WorkflowProps> = memo(({
         <SyncingDataModal />
         <CandidateNode />
         {/* 查看时隐藏头部 */}
-        {!isView && <Header />}
+        {!isView && !isOnlyView && <Header />}
         {/* 查看时隐藏右边弹窗 */}
-        {!isView && <Panel />}
+        {!isView && !isOnlyView && <Panel />}
         {/* 查看时隐藏操作按钮 */}
-        {!isView && <FunctionButton/>}
+        {!isView && !isOnlyView && <FunctionButton/>}
         {!isView && <Operator handleRedo={handleHistoryForward} handleUndo={handleHistoryBack} />}
         {
           showFeaturesPanel && <Features />
@@ -405,10 +406,10 @@ const Workflow: FC<WorkflowProps> = memo(({
           defaultViewport={viewport}
           multiSelectionKeyCode={null}
           deleteKeyCode={null}
-          nodesDraggable={!nodesReadOnly}
-          nodesConnectable={!nodesReadOnly}
+          nodesDraggable={!nodesReadOnly && !isOnlyView}
+          nodesConnectable={!nodesReadOnly && !isOnlyView}
           nodesFocusable={!nodesReadOnly}
-          edgesFocusable={!nodesReadOnly}
+          edgesFocusable={!nodesReadOnly && !isOnlyView}
           panOnDrag={(controlMode === ControlMode.Hand && !workflowReadOnly) || isView}
           zoomOnPinch={!workflowReadOnly || isView}
           zoomOnScroll={!workflowReadOnly || isView}

@@ -16,6 +16,7 @@ import {
   RiLoader2Line,
 } from '@remixicon/react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'next/navigation'
 import type { NodeProps } from '../../types'
 import {
   BlockEnum,
@@ -60,6 +61,8 @@ const BaseNode: FC<BaseNodeProps> = ({
   const { handleNodeIterationChildSizeChange } = useNodeIterationInteractions()
   const toolIcon = useToolIcon(data)
   // console.log('卡片数据', data)
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
 
   useEffect(() => {
     if (nodeRef.current && data.selected && data.isInIteration) {
@@ -170,7 +173,7 @@ const BaseNode: FC<BaseNodeProps> = ({
           )
         }
         {
-          !data._runningStatus && !nodesReadOnly && !data._isCandidate && (
+          !data._runningStatus && !nodesReadOnly && !data._isCandidate && !isOnlyView && (
             <NodeControl
               id={id}
               data={data}

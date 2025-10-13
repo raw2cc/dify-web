@@ -7,6 +7,7 @@ import {
   RiAddLine,
 } from '@remixicon/react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'next/navigation'
 import {
   useAvailableBlocks,
   useNodesInteractions,
@@ -36,6 +37,8 @@ const AddBlock = ({
   const { availableNextBlocks } = useAvailableBlocks(BlockEnum.Start, true)
   const [toolModalOpen, setToolModalOpen] = useState(false) // 添加状态控制弹框
   const [toolModalType, setToolModalType] = useState<'workflow' | 'toolbox' | ''>('')
+  const searchParams = useSearchParams()
+  const isOnlyView = searchParams.get('pageType') === 'onlyView'
   const handleSelect = useCallback<OnSelectBlock>((type, toolDefaultValue) => {
     // 当节点类型为 workflow,toolbox 时，显示弹框而不是创建节点
     if (type === 'workflow' || type === 'toolbox') {
@@ -74,7 +77,7 @@ const AddBlock = ({
         <div className='absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-2 bg-primary-500'></div>
       </div>
       <BlockSelector
-        disabled={nodesReadOnly}
+        disabled={nodesReadOnly || isOnlyView}
         onSelect={handleSelect}
         trigger={renderTriggerElement}
         triggerInnerClassName='inline-flex'
