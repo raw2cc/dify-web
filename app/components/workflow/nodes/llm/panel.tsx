@@ -137,7 +137,7 @@ const Panel: FC<NodePanelProps<LLMNodeType>> = ({
           type='model'
         >
           <ModelParameterModal
-            classNames='flex-1'
+            classNames='flex-1 min-w-0'
             popupClassName='!w-[387px]'
             isInWorkflow
             isAdvancedMode={true}

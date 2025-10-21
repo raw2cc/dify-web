@@ -2,6 +2,9 @@ import type {
   FC,
   ReactNode,
 } from 'react'
+import {
+  RiCloseLine,
+} from '@remixicon/react'
 import { useMemo, useState } from 'react'
 import useSWR from 'swr'
 import { useTranslation } from 'react-i18next'
@@ -102,6 +105,11 @@ const ModelParameterSettingModal: FC<ModelParameterModalProps> = ({
   const hasDeprecated = !currentProvider || !currentModel
   const modelDisabled = currentModel?.status !== ModelStatusEnum.active
   const disabled = !isAPIKeySet || hasDeprecated || modelDisabled
+
+  // 关闭
+  const handleClose = () => {
+    setOpen(false)
+  }
 
   const parameterRules: ModelParameterRule[] = useMemo(() => {
     // 修改文字
@@ -252,11 +260,19 @@ const ModelParameterSettingModal: FC<ModelParameterModalProps> = ({
                 !isLoading && !!parameterRules.length && (
                   <div className={cn('flex items-center justify-between mb-4 p-4 rounded-lg bg-workflow-llm-block-bg', isInWorkflow && '-mx-4 -mt-4', !isInWorkflow && '')}>
                     <div className={cn('font-semibold text-gray-900', isInWorkflow && 'text-[13px]')}>{t('common.modelProvider.parameters')}</div>
-                    {
-                      PROVIDER_WITH_PRESET_TONE.includes(provider) && (
-                        <PresetsParameter onSelect={handleSelectPresetParameter} />
-                      )
-                    }
+                    <div className='ml-auto flex gap-1'>
+                      {
+                        PROVIDER_WITH_PRESET_TONE.includes(provider) && (
+                          <PresetsParameter onSelect={handleSelectPresetParameter} />
+                        )
+                      }
+                      <div
+                        className='flex items-center justify-center w-6 h-6 cursor-pointer'
+                        onClick={() => handleClose()}
+                      >
+                        <RiCloseLine className='w-4 h-4 text-text-tertiary' />
+                      </div>
+                    </div>
                   </div>
                 )
               }
