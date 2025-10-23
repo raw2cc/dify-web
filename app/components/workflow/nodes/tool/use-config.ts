@@ -35,6 +35,7 @@ const useConfig = (id: string, payload: ToolNodeType) => {
   const buildInTools = useStore(s => s.buildInTools)
   const customTools = useStore(s => s.customTools)
   const workflowTools = useStore(s => s.workflowTools)
+  const allWorkflowTools = useStore(s => s.allWorkflowTools)
 
   const currentTools = (() => {
     switch (provider_type) {
@@ -43,7 +44,7 @@ const useConfig = (id: string, payload: ToolNodeType) => {
       case CollectionType.custom:
         return customTools
       case CollectionType.workflow:
-        return workflowTools
+        return allWorkflowTools
       default:
         return []
     }

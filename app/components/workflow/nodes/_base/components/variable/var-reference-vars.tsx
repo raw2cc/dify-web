@@ -247,9 +247,12 @@ const VarReferenceVars: FC<Props> = ({
   const { t } = useTranslation()
   const [searchText, setSearchText] = useState('')
 
+  const isAllowVar = (variable: any): boolean => {
+    return variable === 'sys.app_id'
+  }
   const filteredVars = vars.filter((v) => {
     // 输入列表中去掉sys.开头的系统变量
-    const children = v.vars.filter(v => checkKeys([v.variable], false).isValid || v.variable.startsWith('env.') || v.variable.startsWith('conversation.'))
+    const children = v.vars.filter(v => checkKeys([v.variable], false).isValid || isAllowVar(v.variable) || v.variable.startsWith('env.') || v.variable.startsWith('conversation.'))
     return children.length > 0
   }).filter((node) => {
     if (!searchText)
@@ -261,7 +264,7 @@ const VarReferenceVars: FC<Props> = ({
     return children.length > 0
   }).map((node) => {
     // 输入列表中去掉sys.开头的系统变量
-    let vars = node.vars.filter(v => checkKeys([v.variable], false).isValid || v.variable.startsWith('env.') || v.variable.startsWith('conversation.'))
+    let vars = node.vars.filter(v => checkKeys([v.variable], false).isValid || isAllowVar(v.variable) || v.variable.startsWith('env.') || v.variable.startsWith('conversation.'))
     if (searchText) {
       const searchTextLower = searchText.toLowerCase()
       if (!node.title.toLowerCase().includes(searchTextLower))

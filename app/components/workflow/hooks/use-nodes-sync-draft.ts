@@ -52,6 +52,14 @@ export const useNodesSyncDraft = () => {
 
       let producedNodes = produce(nodes, (draft) => {
         draft.forEach((node) => {
+          // 循环执行节点设置enable_end_condition 字段
+          if (node.data.type === BlockEnum.Iteration) {
+            const iterationData = node.data as any
+            if (iterationData.end_conditions)
+              iterationData.enable_end_condition = iterationData.end_conditions.length > 0
+            else
+              iterationData.enable_end_condition = false
+          }
           Object.keys(node.data).forEach((key) => {
             if (key.startsWith('_'))
               delete node.data[key]

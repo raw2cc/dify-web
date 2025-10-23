@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import type {
   DefaultModel,
   FormValue,
+  ModelItem,
   ModelParameterRule,
 } from '../declarations'
 import { ModelStatusEnum } from '../declarations'
@@ -21,6 +22,7 @@ import Trigger from './trigger'
 import type { TriggerProps } from './trigger'
 import PresetsParameter from './presets-parameter'
 import cn from '@/utils/classnames'
+import Popup from '@/app/components/header/account-setting/model-provider-page/model-selector/popup'
 import {
   PortalToFollowElem,
   PortalToFollowElemContent,
@@ -140,6 +142,11 @@ const ModelParameterModal: FC<ModelParameterModalProps> = ({
     }
   }
 
+  const handleSelect = (provider: string, model: ModelItem) => {
+    setOpen(false)
+    handleChangeModel({ provider, model: model.model })
+  }
+
   const handleSelectPresetParameter = (toneId: number) => {
     const tone = TONE_LIST.find(tone => tone.id === toneId)
     if (tone) {
@@ -157,7 +164,7 @@ const ModelParameterModal: FC<ModelParameterModalProps> = ({
       placement={isInWorkflow ? 'bottom-end' : 'bottom-end'}
       offset={0}
     >
-      <div className={cn('relative', classNames)}>
+      <div className={cn('relative min-w-0', classNames)}>
         <PortalToFollowElemTrigger
           onClick={() => {
             if (readonly)
@@ -197,8 +204,8 @@ const ModelParameterModal: FC<ModelParameterModalProps> = ({
             <div className={cn(
               'max-h-[480px]  overflow-y-auto',
               !isInWorkflow && 'px-10 pt-6 pb-8',
-              isInWorkflow && 'p-4')}>
-              <div className='flex items-center gap-2.5 h-8'>
+              isInWorkflow && 'p-2')}>
+              <div className='flex items-center gap-2.5 h-8 hidden'>
                 <div className={cn('font-semibold text-gray-900 shrink-0', isInWorkflow && 'text-[13px]')}>
                   {t('common.modelProvider.modelSelect').toLocaleUpperCase()}
                 </div>
@@ -207,6 +214,13 @@ const ModelParameterModal: FC<ModelParameterModalProps> = ({
                   modelList={activeTextGenerationModelList}
                   onSelect={handleChangeModel}
                   triggerClassName='max-w-[295px]'
+                />
+              </div>
+              <div className='w-full'>
+                <Popup classNames='w-full border-[0px] shadow-none'
+                  defaultModel={(provider || modelId) ? { provider, model: modelId } : undefined}
+                  modelList={activeTextGenerationModelList}
+                  onSelect={handleSelect}
                 />
               </div>
               {

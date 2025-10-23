@@ -1,18 +1,18 @@
 'use client'
-import type { FC } from 'react'
-import React, { useCallback } from 'react'
+import type {FC} from 'react'
+import React, {useCallback} from 'react'
 import useSWR from 'swr'
 import produce from 'immer'
-import { useTranslation } from 'react-i18next'
-import type { UploadFileSetting } from '../../../types'
-import { SupportUploadFileTypes } from '../../../types'
+import {useTranslation} from 'react-i18next'
+import type {UploadFileSetting} from '../../../types'
+import {SupportUploadFileTypes} from '../../../types'
 import FileTypeItem from './file-type-item'
 import InputNumberWithSlider from './input-number-with-slider'
 import Field from '@/app/components/app/configuration/config-var/config-modal/field'
-import { TransferMethod } from '@/types/app'
-import { fetchFileUploadConfig } from '@/service/common'
-import { useFileSizeLimit } from '@/app/components/base/file-uploader/hooks'
-import { formatFileSize } from '@/utils/format'
+import {TransferMethod} from '@/types/app'
+import {fetchFileUploadConfig} from '@/service/common'
+import {useFileSizeLimit} from '@/app/components/base/file-uploader/hooks'
+import {formatFileSize} from '@/utils/format'
 import Checkbox from '@/app/components/base/checkbox' // 导入复选框组件
 
 type Props = {
@@ -24,13 +24,13 @@ type Props = {
 }
 
 const FileUploadSetting: FC<Props> = ({
-  payload,
-  isMultiple,
-  inFeaturePanel = false,
-  hideSupportFileType = false,
-  onChange,
-}) => {
-  const { t } = useTranslation()
+                                        payload,
+                                        isMultiple,
+                                        inFeaturePanel = false,
+                                        hideSupportFileType = false,
+                                        onChange,
+                                      }) => {
+  const {t} = useTranslation()
 
   const {
     allowed_file_upload_methods,
@@ -38,7 +38,7 @@ const FileUploadSetting: FC<Props> = ({
     allowed_file_types,
     allowed_file_extensions,
   } = payload
-  const { data: fileUploadConfigResponse } = useSWR({ url: '/files/upload' }, fetchFileUploadConfig)
+  const {data: fileUploadConfigResponse} = useSWR({url: '/files/upload'}, fetchFileUploadConfig)
   const {
     imgSizeLimit,
     docSizeLimit,
@@ -54,8 +54,7 @@ const FileUploadSetting: FC<Props> = ({
           draft.allowed_file_types = [SupportUploadFileTypes.custom]
         else
           draft.allowed_file_types = draft.allowed_file_types.filter(v => v !== type)
-      }
-      else {
+      } else {
         draft.allowed_file_types = draft.allowed_file_types.filter(v => v !== SupportUploadFileTypes.custom)
         if (draft.allowed_file_types.includes(type))
           draft.allowed_file_types = draft.allowed_file_types.filter(v => v !== type)
@@ -102,6 +101,7 @@ const FileUploadSetting: FC<Props> = ({
       {!inFeaturePanel && (
         <Field
           title={t('appDebug.variableConfig.file.supportFileTypes')}
+          desc={t('appDebug.variableConfig.file.fileNote')}
         >
           <div className='space-y-1'>
             {
@@ -124,28 +124,55 @@ const FileUploadSetting: FC<Props> = ({
           </div>
         </Field>
       )}
-      <Field
-        title={t('appDebug.variableConfig.uploadFileTypes')}
-        className='mt-4'
-      >
-        {/* 改为复选框形式 */}
-        <div className='flex flex-row space-x-4'>
-          <div className='flex w-1/2'>
-            <Checkbox
-              checked={allowed_file_upload_methods.includes(TransferMethod.local_file)}
-              onCheck={() => handleUploadMethodChange(TransferMethod.local_file)}
+      {/*<Field*/}
+      {/*  title={t('appDebug.variableConfig.uploadFileTypes')}*/}
+      {/*  className='mt-4'*/}
+      {/*>*/}
+      {/*  /!* 改为复选框形式 *!/*/}
+      {/*  <div className='flex flex-row space-x-4'>*/}
+      {/*    <div className='flex w-1/2'>*/}
+      {/*      <Checkbox*/}
+      {/*        checked={allowed_file_upload_methods.includes(TransferMethod.local_file)}*/}
+      {/*        onCheck={() => handleUploadMethodChange(TransferMethod.local_file)}*/}
+      {/*      />*/}
+      {/*      <span className='ml-2 text-sm text-gray-700'>{t('appDebug.variableConfig.localUpload')}</span>*/}
+      {/*    </div>*/}
+      {/*    <div className='flex w-1/2'>*/}
+      {/*      <Checkbox*/}
+      {/*        checked={allowed_file_upload_methods.includes(TransferMethod.remote_url)}*/}
+      {/*        onCheck={() => handleUploadMethodChange(TransferMethod.remote_url)}*/}
+      {/*      />*/}
+      {/*      <span className='ml-2 text-sm text-gray-700'>URL</span>*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</Field>*/}
+      {inFeaturePanel && !hideSupportFileType && (
+        <Field
+          title={t('appDebug.variableConfig.file.supportFileTypes')}
+          desc={t('appDebug.variableConfig.file.fileNote')}
+          className='mt-4'
+        >
+          <div className='space-y-1'>
+            {
+              [SupportUploadFileTypes.document, SupportUploadFileTypes.image, SupportUploadFileTypes.audio, SupportUploadFileTypes.video].map((type: SupportUploadFileTypes) => (
+                <FileTypeItem
+                  key={type}
+                  type={type as SupportUploadFileTypes.image | SupportUploadFileTypes.document | SupportUploadFileTypes.audio | SupportUploadFileTypes.video}
+                  selected={allowed_file_types.includes(type)}
+                  onToggle={handleSupportFileTypeChange}
+                />
+              ))
+            }
+            <FileTypeItem
+              type={SupportUploadFileTypes.custom}
+              selected={allowed_file_types.includes(SupportUploadFileTypes.custom)}
+              onToggle={handleSupportFileTypeChange}
+              customFileTypes={allowed_file_extensions}
+              onCustomFileTypesChange={handleCustomFileTypesChange}
             />
-            <span className='ml-2 text-sm text-gray-700'>{t('appDebug.variableConfig.localUpload')}</span>
           </div>
-          <div className='flex w-1/2'>
-            <Checkbox
-              checked={allowed_file_upload_methods.includes(TransferMethod.remote_url)}
-              onCheck={() => handleUploadMethodChange(TransferMethod.remote_url)}
-            />
-            <span className='ml-2 text-sm text-gray-700'>URL</span>
-          </div>
-        </div>
-      </Field>
+        </Field>
+      )}
       {isMultiple && (
         <Field
           className='mt-4'
@@ -168,33 +195,6 @@ const FileUploadSetting: FC<Props> = ({
           </div>
         </Field>
       )}
-      {inFeaturePanel && !hideSupportFileType && (
-        <Field
-          title={t('appDebug.variableConfig.file.supportFileTypes')}
-          className='mt-4'
-        >
-          <div className='space-y-1'>
-            {
-              [SupportUploadFileTypes.document, SupportUploadFileTypes.image, SupportUploadFileTypes.audio, SupportUploadFileTypes.video].map((type: SupportUploadFileTypes) => (
-                <FileTypeItem
-                  key={type}
-                  type={type as SupportUploadFileTypes.image | SupportUploadFileTypes.document | SupportUploadFileTypes.audio | SupportUploadFileTypes.video}
-                  selected={allowed_file_types.includes(type)}
-                  onToggle={handleSupportFileTypeChange}
-                />
-              ))
-            }
-            <FileTypeItem
-              type={SupportUploadFileTypes.custom}
-              selected={allowed_file_types.includes(SupportUploadFileTypes.custom)}
-              onToggle={handleSupportFileTypeChange}
-              customFileTypes={allowed_file_extensions}
-              onCustomFileTypesChange={handleCustomFileTypesChange}
-            />
-          </div>
-        </Field>
-      )}
-
     </div>
   )
 }

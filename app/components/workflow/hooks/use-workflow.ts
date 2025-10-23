@@ -55,6 +55,7 @@ import {
   fetchAllBuiltInTools,
   fetchAllCustomToolList,
   fetchAllCustomTools,
+  fetchAllWorkflowToolList,
   fetchAllWorkflowTools,
 } from '@/service/tools'
 import I18n from '@/context/i18n'
@@ -443,16 +444,22 @@ export const useFetchToolsData = () => {
     }
     if (type === 'custom') {
       const customTools = await fetchAllCustomTools()
-      // const customTools = await fetchAllCustomToolList()
+      const allCustomTools = await fetchAllCustomToolList()
       workflowStore.setState({
         customTools: customTools || [],
+      })
+      workflowStore.setState({
+        allCustomTools: allCustomTools || [],
       })
     }
     if (type === 'workflow') {
       const workflowTools = await fetchAllWorkflowTools()
-
+      const allWorkflowTools = await fetchAllWorkflowToolList()
       workflowStore.setState({
         workflowTools: workflowTools || [],
+      })
+      workflowStore.setState({
+        allWorkflowTools: allWorkflowTools || [],
       })
     }
   }, [workflowStore])

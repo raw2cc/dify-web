@@ -112,12 +112,18 @@ export const fetchAllCustomTools = () => {
   return get<ToolWithProvider[]>('/workspaces/current/tools/api')
 }
 
+// 获取所有自定义工具列表（所有租户）
 export const fetchAllCustomToolList = () => {
-  return get<ToolInfo>('/workspaces/current/tool-providers-page?type=api&pageNumber=1&pageSize=10000').then(res => res.records || [])
+  return get<ToolWithProvider[]>('/admin/current/tools/api')
 }
 
 export const fetchAllWorkflowTools = () => {
   return get<ToolWithProvider[]>('/workspaces/current/tools/workflow')
+}
+
+// 获取所有工具流工具列表（所有租户）
+export const fetchAllWorkflowToolList = () => {
+  return get<ToolWithProvider[]>('/admin/current/tools/workflow')
 }
 
 export const fetchLabelList = () => {

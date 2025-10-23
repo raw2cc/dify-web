@@ -10,17 +10,20 @@ import type {
 } from '../declarations'
 import { useLanguage } from '../hooks'
 import PopupItem from './popup-item'
+import cn from '@/utils/classnames'
 import { XCircle } from '@/app/components/base/icons/src/vender/solid/general'
 
 type PopupProps = {
   defaultModel?: DefaultModel
   modelList: Model[]
   onSelect: (provider: string, model: ModelItem) => void
+  classNames?: string
 }
 const Popup: FC<PopupProps> = ({
   defaultModel,
   modelList,
   onSelect,
+  classNames,
 }) => {
   const language = useLanguage()
   const [searchText, setSearchText] = useState('')
@@ -39,7 +42,7 @@ const Popup: FC<PopupProps> = ({
   }).filter(model => model.models.length > 0)
 
   return (
-    <div className='w-[320px] max-h-[480px] rounded-lg border-[0.5px] border-gray-200 bg-white shadow-lg overflow-y-auto'>
+    <div className={cn('w-[320px] max-h-[480px] rounded-lg border-[0.5px] border-gray-200 bg-white shadow-lg overflow-y-auto', classNames)}>
       <div className='sticky top-0 pl-3 pt-3 pr-2 pb-1 bg-white z-10'>
         <div className={`
           flex items-center pl-[9px] pr-[10px] h-8 rounded-lg border

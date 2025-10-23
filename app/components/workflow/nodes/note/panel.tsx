@@ -122,7 +122,7 @@ const Panel: FC<NodePanelProps<StartNodeType>> = ({
                   </div>
                 }
               />}
-              {false && <VarItem
+              {<VarItem
                 readonly
                 payload={{
                   variable: 'sys.app_id',

@@ -70,7 +70,7 @@ const Field: FC<Props> = ({
           )}
         </div>
       </div>
-      {children && (!supportFold || (supportFold && !fold)) && <div className={cn(!inline && 'mt-1', type === 'model' && 'flex-1 flex gap-1.5 items-center min-w-0')}>{children}</div>}
+      {children && (!supportFold || (supportFold && !fold)) && <div className={cn(!inline && 'mt-1', type === 'model' && 'flex-1 flex gap-1.5 items-center', 'min-w-0')}>{children}</div>}
     </div>
   )
 }

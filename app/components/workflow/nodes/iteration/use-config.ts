@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import produce from 'immer'
 import { useBoolean } from 'ahooks'
+import { v4 as uuid4 } from 'uuid'
 import {
   useIsChatMode,
   useIsNodeInIteration,
@@ -12,7 +13,10 @@ import type { ErrorHandleMode, ValueSelector, Var } from '../../types'
 import useNodeCrud from '../_base/hooks/use-node-crud'
 import { getNodeInfoById, getNodeUsedVarPassToServerKey, getNodeUsedVars, isSystemVar, toNodeOutputVars } from '../_base/components/variable/utils'
 import useOneStepRun from '../_base/hooks/use-one-step-run'
-import type { IterationNodeType } from './types'
+import { getOperators } from './utils'
+import { LogicalOperator } from './types'
+import type { HandleAddCondition, HandleAddSubVariableCondition, HandleRemoveCondition, HandleToggleConditionLogicalOperator, HandleToggleSubVariableConditionLogicalOperator, HandleUpdateCondition, HandleUpdateSubVariableCondition, IterationNodeType } from './types'
+import useIsVarFileAttribute from './use-is-var-file-attribute'
 import type { VarType as VarKindType } from '@/app/components/workflow/nodes/tool/types'
 import type { Item } from '@/app/components/base/select'
 
@@ -38,6 +42,7 @@ const useConfig = (id: string, payload: IterationNodeType) => {
   // output
   const { getIterationNodeChildren, getBeforeNodesInSameBranch } = useWorkflow()
   const beforeNodes = getBeforeNodesInSameBranch(id)
+  // const loopChildrenNodes = [{ id, data: payload } as any, ...getIterationNodeChildren(id)]
   const iterationChildrenNodes = getIterationNodeChildren(id)
   const canChooseVarNodes = [...beforeNodes, ...iterationChildrenNodes]
   const childrenNodeVars = toNodeOutputVars(iterationChildrenNodes, isChatMode)
@@ -155,6 +160,108 @@ const useConfig = (id: string, payload: IterationNodeType) => {
     }
   })()
 
+  const {
+    getIsVarFileAttribute,
+  } = useIsVarFileAttribute({
+    nodeId: id,
+  })
+
+  const handleAddCondition = useCallback<HandleAddCondition>((valueSelector, varItem) => {
+    const newInputs = produce(inputs, (draft) => {
+      if (!draft.end_conditions)
+        draft.end_conditions = []
+
+      draft.end_conditions?.push({
+        id: uuid4(),
+        varType: varItem.type,
+        variable_selector: valueSelector,
+        comparison_operator: getOperators(varItem.type, getIsVarFileAttribute(valueSelector) ? { key: valueSelector.slice(-1)[0] } : undefined)[0],
+        value: '',
+      })
+    })
+    setInputs(newInputs)
+  }, [getIsVarFileAttribute, inputs, setInputs])
+  const handleUpdateCondition = useCallback<HandleUpdateCondition>((conditionId, newCondition) => {
+    const newInputs = produce(inputs, (draft) => {
+      const targetCondition = draft.end_conditions?.find(item => item.id === conditionId)
+      if (targetCondition)
+        Object.assign(targetCondition, newCondition)
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
+  const handleRemoveCondition = useCallback<HandleRemoveCondition>((conditionId) => {
+    const newInputs = produce(inputs, (draft) => {
+      draft.end_conditions = draft.end_conditions?.filter(item => item.id !== conditionId)
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
+  const handleToggleConditionLogicalOperator = useCallback<HandleToggleConditionLogicalOperator>(() => {
+    const newInputs = produce(inputs, (draft) => {
+      draft.end_condition_logical_operator = draft.end_condition_logical_operator === LogicalOperator.and ? LogicalOperator.or : LogicalOperator.and
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
+  const handleRemoveSubVariableCondition = useCallback((conditionId: string, subConditionId: string) => {
+    const newInputs = produce(inputs, (draft) => {
+      const condition = draft.end_conditions?.find(item => item.id === conditionId)
+      if (!condition)
+        return
+      if (!condition?.sub_variable_condition)
+        return
+      const subVarCondition = condition.sub_variable_condition
+      if (subVarCondition)
+        subVarCondition.conditions = subVarCondition.conditions.filter(item => item.id !== subConditionId)
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
+  const handleUpdateSubVariableCondition = useCallback<HandleUpdateSubVariableCondition>((conditionId, subConditionId, newSubCondition) => {
+    const newInputs = produce(inputs, (draft) => {
+      const targetCondition = draft.end_conditions?.find(item => item.id === conditionId)
+      if (targetCondition && targetCondition.sub_variable_condition) {
+        const targetSubCondition = targetCondition.sub_variable_condition.conditions.find(item => item.id === subConditionId)
+        if (targetSubCondition)
+          Object.assign(targetSubCondition, newSubCondition)
+      }
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
+  const handleToggleSubVariableConditionLogicalOperator = useCallback<HandleToggleSubVariableConditionLogicalOperator>((conditionId) => {
+    const newInputs = produce(inputs, (draft) => {
+      const targetCondition = draft.end_conditions?.find(item => item.id === conditionId)
+      if (targetCondition && targetCondition.sub_variable_condition)
+        targetCondition.sub_variable_condition.logical_operator = targetCondition.sub_variable_condition.logical_operator === LogicalOperator.and ? LogicalOperator.or : LogicalOperator.and
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
+  const handleAddSubVariableCondition = useCallback<HandleAddSubVariableCondition>((conditionId: string, key?: string) => {
+    const newInputs = produce(inputs, (draft) => {
+      const condition = draft.end_conditions?.find(item => item.id === conditionId)
+      if (!condition)
+        return
+      if (!condition?.sub_variable_condition) {
+        condition.sub_variable_condition = {
+          logical_operator: LogicalOperator.and,
+          conditions: [],
+        }
+      }
+      const subVarCondition = condition.sub_variable_condition
+      if (subVarCondition) {
+        if (!subVarCondition.conditions)
+          subVarCondition.conditions = []
+
+        const svcComparisonOperators = getOperators(VarType.string, { key: key || '' })
+
+        subVarCondition.conditions.push({
+          id: uuid4(),
+          key: key || '',
+          varType: VarType.string,
+          comparison_operator: (svcComparisonOperators && svcComparisonOperators.length) ? svcComparisonOperators[0] : undefined,
+          value: '',
+        })
+      }
+    })
+    setInputs(newInputs)
+  }, [inputs, setInputs])
   const handleRun = useCallback((data: Record<string, any>) => {
     const formattedData: Record<string, any> = {}
     Object.keys(allVarObject).forEach((key) => {
@@ -239,6 +346,14 @@ const useConfig = (id: string, payload: IterationNodeType) => {
     changeParallel,
     changeErrorResponseMode,
     changeParallelNums,
+    handleAddCondition,
+    handleUpdateCondition,
+    handleRemoveCondition,
+    handleToggleConditionLogicalOperator,
+    handleAddSubVariableCondition,
+    handleRemoveSubVariableCondition,
+    handleUpdateSubVariableCondition,
+    handleToggleSubVariableConditionLogicalOperator,
   }
 }
 

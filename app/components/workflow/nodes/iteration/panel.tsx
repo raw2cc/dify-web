@@ -11,6 +11,7 @@ import IterationResultPanel from '../../run/iteration-result-panel'
 import { MAX_ITERATION_PARALLEL_NUM, MIN_ITERATION_PARALLEL_NUM } from '../../constants'
 import type { IterationNodeType } from './types'
 import useConfig from './use-config'
+import ConditionWrap from './components/condition-wrap'
 import { ErrorHandleMode, InputVarType, type NodePanelProps } from '@/app/components/workflow/types'
 import Field from '@/app/components/workflow/nodes/_base/components/field'
 import BeforeRunForm from '@/app/components/workflow/nodes/_base/components/before-run-form'
@@ -68,10 +69,41 @@ const Panel: FC<NodePanelProps<IterationNodeType>> = ({
     changeParallel,
     changeErrorResponseMode,
     changeParallelNums,
+    handleAddCondition,
+    handleUpdateCondition,
+    handleRemoveCondition,
+    handleToggleConditionLogicalOperator,
+    handleAddSubVariableCondition,
+    handleRemoveSubVariableCondition,
+    handleUpdateSubVariableCondition,
+    handleToggleSubVariableConditionLogicalOperator,
   } = useConfig(id, data)
 
   return (
     <div className='pt-2 pb-2'>
+      <div className='pb-4 space-y-4'>
+        <Field
+          title={<div className='pl-3'>{t(`${i18nPrefix}.breakCondition`)}</div>}
+          tooltip={t(`${i18nPrefix}.breakConditionTip`)}
+        >
+          <ConditionWrap
+            nodeId={id}
+            readOnly={readOnly}
+            handleAddCondition={handleAddCondition}
+            handleRemoveCondition={handleRemoveCondition}
+            handleUpdateCondition={handleUpdateCondition}
+            handleToggleConditionLogicalOperator={handleToggleConditionLogicalOperator}
+            handleAddSubVariableCondition={handleAddSubVariableCondition}
+            handleRemoveSubVariableCondition={handleRemoveSubVariableCondition}
+            handleUpdateSubVariableCondition={handleUpdateSubVariableCondition}
+            handleToggleSubVariableConditionLogicalOperator={handleToggleSubVariableConditionLogicalOperator}
+            availableNodes={iterationChildrenNodes}
+            availableVars={childrenNodeVars}
+            conditions={inputs.end_conditions || []}
+            logicalOperator={inputs.end_condition_logical_operator!}
+          />
+        </Field>
+      </div>
       <div className='px-4 pb-4 space-y-4'>
         <Field
           title={t(`${i18nPrefix}.input`)}

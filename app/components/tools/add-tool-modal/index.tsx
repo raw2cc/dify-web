@@ -24,7 +24,6 @@ import ConfigCredential from '@/app/components/tools/setting/build-in/config-cre
 import {
   createCustomCollection,
   fetchAllBuiltInTools,
-  fetchAllCustomToolList,
   fetchAllCustomTools,
   fetchAllWorkflowTools,
   removeBuiltInToolCredential,
@@ -59,7 +58,6 @@ const AddToolModal: FC<Props> = ({
     setListLoading(true)
     const buildInTools = await fetchAllBuiltInTools()
     const customTools = await fetchAllCustomTools()
-    // const customTools = await fetchAllCustomToolList()
     const workflowTools = await fetchAllWorkflowTools()
     const mergedToolList = [
       ...buildInTools,
