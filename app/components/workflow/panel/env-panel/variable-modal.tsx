@@ -48,9 +48,9 @@ const VariableModal = ({
     if (!checkVariableName(name))
       return
     if (!value)
-      return notify({ type: 'error', message: 'value can not be empty' })
+      return notify({ type: 'error', message: '值不能为空' })
     if (!env && envList.some(env => env.name === name))
-      return notify({ type: 'error', message: 'name is existed' })
+      return notify({ type: 'error', message: '名称已存在' })
     onSave({
       id: env ? env.id : uuid4(),
       value_type: type,
