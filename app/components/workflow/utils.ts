@@ -835,3 +835,24 @@ export const replaceStartQuery = (obj: any, oldValue: string, newValue: string):
   // 其他类型（如数字、布尔值等）保持不变
   return obj
 }
+
+// 匹配对应的背景色
+export function getBackgroundColor(color: any) {
+  // 检查style是否为空或者只包含空格
+  if (!color || /^\s*$/.test(color)) {
+    // 如果是空或者只包含空格，返回空字符串或者其他默认值
+    return '' // 或者其他默认值
+  }
+  if (color === 'blue')
+    return 'linear-gradient(180deg, #7ba9f4 0%, #587eee 100%)'
+  else if (color === 'green')
+    return 'linear-gradient(180deg, #76e8db 0%, #59bba1 100%)'
+  else if (color === 'yellow')
+    return 'linear-gradient(180deg, #eecc75 0%, #e3ad5a 100%)'
+  else if (color === 'red')
+    return 'linear-gradient(180deg, #f3c097 0%, #e09759 100%)'
+  else if (color === 'purple')
+    return 'linear-gradient(180deg, #b699f2 0%, #8f6ae9 100%)'
+  // 若无匹配，返回原颜色
+  return color
+}

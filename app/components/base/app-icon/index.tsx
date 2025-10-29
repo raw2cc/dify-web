@@ -6,6 +6,9 @@ import data from '@emoji-mart/data'
 import { cva } from 'class-variance-authority'
 import type { AppIconType } from '@/types/app'
 import classNames from '@/utils/classnames'
+import {
+  getBackgroundColor,
+} from '@/app/components/workflow/utils'
 
 init({ data })
 
@@ -54,16 +57,18 @@ const AppIcon: FC<AppIconProps> = ({
   onClick,
 }) => {
   const isValidImageIcon = iconType === 'image' && imageUrl
-
+  const isElementIcon = icon && icon.startsWith('el-icon')
   return <span
     className={classNames(appIconVariants({ size, rounded }), className)}
-    style={{ background: isValidImageIcon ? undefined : (background || '#FFEAD5') }}
+    style={{ background: isValidImageIcon ? undefined : isElementIcon ? getBackgroundColor(background) : (getBackgroundColor(background) || '#FFEAD5') }}
     onClick={onClick}
   >
     {isValidImageIcon
       // eslint-disable-next-line @next/next/no-img-element
       ? <img src={imageUrl} className="w-full h-full" alt="app icon" />
-      : (innerIcon || ((icon && icon !== '') ? <em-emoji id={icon} /> : <em-emoji id='🤖' />))
+      : isElementIcon
+        ? <i className={icon}></i>
+        : (innerIcon || ((icon && icon !== '') ? <em-emoji id={icon} /> : <em-emoji id='🤖' />))
     }
   </span>
 }

@@ -679,6 +679,8 @@ button:focus-within {
 @import '../components/base/action-button/index.css';
 @import '../components/base/modal/index.css';
 
+@import './iconfonts/icon.css';
+
 @tailwind utilities;
 .bg-components-panel-bg .sticky.top-0.bg-workflow-kr-block-bg,
 .bg-components-panel-bg .sticky.top-0.bg-workflow-llm-block-bg,

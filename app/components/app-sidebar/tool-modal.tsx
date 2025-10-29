@@ -45,7 +45,7 @@ const ToolModal: React.FC<ToolModalProps> = ({ open, onCancel, toolType, onSelec
         if (record?.parent) {
           return (
             <div className='flex items-center'>
-              <BlockIcon className="mr-2 shrink-0" type={BlockEnum.Tool} toolIcon={record.parent?.icon}/>
+              <BlockIcon className="mr-2 shrink-0" type={BlockEnum.Tool} toolIcon={record.parent?.icon} size="md"/>
               <span className=''>{t(label[language])}</span>
             </div>
           )
