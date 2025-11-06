@@ -41,7 +41,8 @@ ENV APP_API_URL=http://127.0.0.1:5001
 ENV PORT=3000
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_PATH=/aiw
-
+ENV SAFE_PLATFORM_API_URL=http://59.206.26.9:8086/safety
+ENV UC_API_URL=http://59.206.26.9:8086/uccenter-tenant
 # set timezone
 ENV TZ=UTC
 RUN ln -s /usr/share/zoneinfo/${TZ} /etc/localtime \

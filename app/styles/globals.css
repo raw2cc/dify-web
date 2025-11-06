@@ -697,3 +697,16 @@ button:focus-within {
 .bg-components-panel-bg .sticky.top-0.bg-workflow-normal-block-bg input {
   background-color: transparent;
 }
+
+/* 自定义表格样式 */
+.custom-ant-table {
+  border-radius: 8px;
+  
+  .ant-table-tbody>tr>td {
+    padding: 10px 10px;
+  }
+  
+  .ant-table-pagination.ant-pagination{
+    margin: 8px 0;
+  }
+}

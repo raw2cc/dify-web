@@ -48,6 +48,8 @@ const LocaleLayout = ({
         data-public-indexing-max-segmentation-tokens-length={process.env.NEXT_PUBLIC_INDEXING_MAX_SEGMENTATION_TOKENS_LENGTH}
         data-public-auth-way={process.env.NEXT_PUBLIC_AUTH_WAY}
         data-public-public-path={process.env.NEXT_PUBLIC_PUBLIC_PATH}
+        data-public-safe-platform-api-prefix={process.env.NEXT_PUBLIC_SAFE_PLATFORM_API_PREFIX}
+        data-public-uc-api-prefix={process.env.NEXT_PUBLIC_UC_API_PREFIX}
       >
         <BrowserInitor>
           <SentryInitor>

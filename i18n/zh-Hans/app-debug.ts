@@ -170,6 +170,24 @@ const translation = {
             outputEnabled: '输出内容',
             modal: {
                 title: '内容审查设置',
+                table: {
+                    ruleName: '规则名称',
+                    ruleContent: '规则内容',
+                    ruleType: '规则类型',
+                    ruleTypeInfo: '所属分类',
+                    rulePlatform: '来源类型',
+                    createdName: '创建人',
+                    createdAt: '创建时间',
+                    operation: '操作',
+                },
+                selectModal: {
+                  title: '选择可信规则',
+                  searchName: '搜索规则名称',
+                  ruleDelete: '规则删除',
+                  deleteTip: '是否确认删除该自定义规则？',
+                  deleteSuccess: '删除成功',
+                  deleteFail: '删除失败',
+                },
                 provider: {
                     title: '类别',
                     openai: 'OpenAI Moderation',
@@ -179,6 +197,10 @@ const translation = {
                     },
                     keywords: '关键词',
                 },
+                addRule: '创建规则',
+                matchRule: '配置可信规则',
+                matchAllRule: '配置全部规则',
+                matchDemandRule: '配置需求规则',
                 keywords: {
                     tip: '每行一个，用换行符分隔。每行最多 100 个字符。',
                     // placeholder: '每行一个，用换行符分隔',

@@ -5,6 +5,8 @@ import { PromptRole } from '@/models/debug'
 
 export let apiPrefix = ''
 export let publicApiPrefix = ''
+export let safePlatformApiPrefix = ''
+export let ucApiPrefix = ''
 
 export let authWay = ''
 export let publicPath = ''
@@ -13,6 +15,8 @@ export let publicPath = ''
 if (process.env.NEXT_PUBLIC_API_PREFIX && process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX) {
   apiPrefix = process.env.NEXT_PUBLIC_API_PREFIX
   publicApiPrefix = process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX
+  safePlatformApiPrefix = process.env.NEXT_PUBLIC_SAFE_PLATFORM_API_PREFIX as string
+  ucApiPrefix = process.env.NEXT_PUBLIC_UC_API_PREFIX as string
   // 判断是否在福诺运行
   authWay = process.env.NEXT_PUBLIC_AUTH_WAY as string
   publicPath = process.env.NEXT_PUBLIC_PUBLIC_PATH as string
@@ -25,8 +29,10 @@ else if (
   apiPrefix = globalThis.document.body.getAttribute('data-api-prefix') as string
   publicApiPrefix = globalThis.document.body.getAttribute('data-pubic-api-prefix') as string
   // 判断是否在福诺运行
-  authWay = globalThis.document.body.getAttribute('data-public-auth-way')
-  publicPath = globalThis.document.body.getAttribute('data-public-public-path') as string as string
+  authWay = globalThis.document.body.getAttribute('data-public-auth-way') as string
+  publicPath = globalThis.document.body.getAttribute('data-public-public-path') as string
+  safePlatformApiPrefix = globalThis.document.body.getAttribute('data-public-safe-platform-api-prefix') as string
+  ucApiPrefix = globalThis.document.body.getAttribute('data-public-uc-api-prefix') as string
 }
 else {
   // const domainParts = globalThis.location?.host?.split('.');
@@ -36,6 +42,8 @@ else {
   publicApiPrefix = 'http://localhost:5001/api' // avoid browser private mode api cross origin
   // 默认非福诺
   authWay = 'SIGN'
+  safePlatformApiPrefix = ''
+  ucApiPrefix = ''
   publicPath = '/aiw'
 }
 // 导出环境判断
@@ -44,6 +52,8 @@ export const PUBLIC_PATH: string = publicPath
 
 export const API_PREFIX: string = apiPrefix
 export const PUBLIC_API_PREFIX: string = publicApiPrefix
+export const SAFE_PLATFORM_API_PREFIX: string = safePlatformApiPrefix
+export const UC_API_PREFIX: string = ucApiPrefix
 
 const EDITION = process.env.NEXT_PUBLIC_EDITION || globalThis.document?.body?.getAttribute('data-public-edition') || 'SELF_HOSTED'
 export const IS_CE_EDITION = EDITION === 'SELF_HOSTED'

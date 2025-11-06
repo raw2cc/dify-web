@@ -29,6 +29,8 @@ export NEXT_PUBLIC_INDEXING_MAX_SEGMENTATION_TOKENS_LENGTH=${INDEXING_MAX_SEGMEN
 
 export NEXT_PUBLIC_AUTH_WAY=${AUTH_WAY}
 export NEXT_PUBLIC_PUBLIC_PATH=${NEXT_PUBLIC_PATH}
+export NEXT_PUBLIC_SAFE_PLATFORM_API_PREFIX=${SAFE_PLATFORM_API_URL}
+export NEXT_PUBLIC_UC_API_PREFIX=${UC_API_URL}
 
 # Replace /_next/static with NEXT_PUBLIC_PUBLIC_PATH in all HTML files
 find /app -name "*.html" -type f -exec sed -i "s|/_next/static|${NEXT_PUBLIC_PUBLIC_PATH}/_next/static|g" {} \;

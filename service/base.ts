@@ -4,6 +4,8 @@ import {
   AUTH_WAY,
   IS_CE_EDITION,
   PUBLIC_API_PREFIX,
+  UC_API_PREFIX,
+  SAFE_PLATFORM_API_PREFIX,
 } from "@/config";
 import Toast from "@/app/components/base/toast";
 import type {
@@ -372,15 +374,23 @@ const baseFetch = <T>(
     const accessToken = localStorage.getItem("console_token") || "";
     options.headers.set("Authorization", `Bearer ${accessToken}`);
   }
+  let base = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX
   // 福诺请求头
   if (AUTH_WAY === "FUNUO") {
-    const base = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
+    if (url.includes('UC_API_PREFIX')) {
+      url = url.replace('UC_API_PREFIX', '')
+      base = UC_API_PREFIX
+    }
+    if (url.includes('SAFE_PLATFORM_PREFIX')) {
+      url = url.replace('SAFE_PLATFORM_PREFIX', '')
+      base = SAFE_PLATFORM_API_PREFIX
+    }
     url += `${url.includes("?") ? "&" : "?"}_t=${new Date().getTime()}`;
     const axiosOptions = {
       baseURL: base,
       url,
       method: options.method,
-    };
+    }
     const requestUrl = getRequestUrl(axiosOptions);
     if (requestUrl) options.headers.set("Request-Url", requestUrl);
     if (getLsToken()) {
@@ -402,7 +412,7 @@ const baseFetch = <T>(
     if (!contentType) options.headers.set("Content-Type", ContentType.json);
   }
 
-  let urlPrefix = isPublicAPI ? PUBLIC_API_PREFIX : API_PREFIX;
+  let urlPrefix = base
   // 如果是调用自己后端接口，则去掉proxy/console/api
   if (url.includes('export?include_secret'))
     urlPrefix = urlPrefix.replace('/proxy/console/api', '')

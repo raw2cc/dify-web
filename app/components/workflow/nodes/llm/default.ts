@@ -26,10 +26,10 @@ const nodeDefault: NodeDefault<LLMNodeType> = {
     vision: {
       enabled: false,
     },
-    memory: {
-      window: { enabled: false, size: 50 },
-      query_prompt_template: '{{#start_query#}}',
-    },
+    // memory: {
+    //   window: { enabled: false, size: 50 },
+    //   query_prompt_template: '{{#start_query#}}',
+    // },
   },
   getAvailablePrevNodes(isChatMode: boolean) {
     const nodes = isChatMode
