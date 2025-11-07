@@ -57,7 +57,7 @@ const BaseNode: FC<BaseNodeProps> = ({
 }) => {
   const { t } = useTranslation()
   const nodeRef = useRef<HTMLDivElement>(null)
-  const { nodesReadOnly } = useNodesReadOnly()
+  const { nodesReadOnly, isView } = useNodesReadOnly()
   const { handleNodeIterationChildSizeChange } = useNodeIterationInteractions()
   const toolIcon = useToolIcon(data)
   // console.log('卡片数据', data)
@@ -124,6 +124,7 @@ const BaseNode: FC<BaseNodeProps> = ({
           showFailedBorder && '!border-state-destructive-solid',
           showExceptionBorder && '!border-state-warning-solid',
           data._isBundled && '!shadow-lg',
+          showSuccessBorder && isView && 'border-8',
         )}
         style={{
           backgroundColor: showRunningBorder ? '#7cb1e3' : '',

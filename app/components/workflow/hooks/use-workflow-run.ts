@@ -103,10 +103,9 @@ export const useWorkflowRun = () => {
       workflowRunningData,
     } = workflowStore.getState()
     const isView = searchParams.get('pageType') === 'view'
-
+    // console.log('handleRun', workflowRunningData, isView)
     if (isView) {
       if (!workflowRunningData?.tracing?.length) {
-        console.log('workflowRunningData', workflowRunningData)
         setWorkflowRunningData({
           result: {
             status: WorkflowRunningStatus.Running,
@@ -186,6 +185,7 @@ export const useWorkflowRun = () => {
     const player = AudioPlayerManager.getInstance().getAudioPlayer(ttsUrl, ttsIsPublic, uuidV4(), 'none', 'none', (_: any): any => {})
     params.clientType = 'PORTAL'
     params.invokeFromEnum = 'DEBUGGER'
+    // console.log('sse请求接口了')
     ssePost(
       url,
       {
@@ -193,6 +193,7 @@ export const useWorkflowRun = () => {
       },
       {
         onWorkflowStarted: (params) => {
+          // console.log('onWorkflowStarted1', params)
           const { task_id, data } = params
           const {
             workflowRunningData,
@@ -248,6 +249,7 @@ export const useWorkflowRun = () => {
             onWorkflowStarted(params)
         },
         onWorkflowFinished: (params) => {
+          // console.log('onWorkflowFinished1', params)
           const { data } = params
           const {
             workflowRunningData,
@@ -274,6 +276,7 @@ export const useWorkflowRun = () => {
             onWorkflowFinished(params)
         },
         onError: (params) => {
+          // console.log('onError1', params)
           const {
             workflowRunningData,
             setWorkflowRunningData,
@@ -290,6 +293,7 @@ export const useWorkflowRun = () => {
             onError(params)
         },
         onNodeStarted: (params) => {
+          // console.log('onNodeStarted1', params)
           const { data } = params
           const {
             workflowRunningData,
@@ -387,6 +391,7 @@ export const useWorkflowRun = () => {
             onNodeStarted(params)
         },
         onNodeFinished: (params) => {
+          // console.log('onNodeFinished1', params)
           const { data } = params
           const {
             workflowRunningData,
@@ -524,6 +529,7 @@ export const useWorkflowRun = () => {
             onNodeFinished(params)
         },
         onIterationStart: (params) => {
+          // console.log('onIterationStart1', params)
           const { data } = params
           const {
             workflowRunningData,
@@ -587,6 +593,7 @@ export const useWorkflowRun = () => {
             onIterationStart(params)
         },
         onIterationNext: (params) => {
+          // console.log('onIterationNext1', params)
           const {
             workflowRunningData,
             setWorkflowRunningData,
@@ -623,6 +630,7 @@ export const useWorkflowRun = () => {
             onIterationNext(params)
         },
         onIterationFinish: (params) => {
+          // console.log('onIterationFinish1', params)
           const { data } = params
 
           const {
@@ -659,6 +667,7 @@ export const useWorkflowRun = () => {
             onIterationFinish(params)
         },
         onNodeRetry: (params) => {
+          // console.log('onNodeRetry1', params)
           const { data } = params
           const {
             workflowRunningData,
@@ -789,6 +798,7 @@ export const useWorkflowRun = () => {
           }
           : callback?.onCompleted,
         ...restCallback,
+        isView,
       },
     )
   }, [store, reactflow, workflowStore, doSyncWorkflowDraft])

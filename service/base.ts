@@ -140,6 +140,7 @@ export type IOtherOptions = {
   onTTSChunk?: IOnTTSChunk;
   onTTSEnd?: IOnTTSEnd;
   onTextReplace?: IOnTextReplace;
+  isView?: boolean;
 };
 
 type ResponseError = {
@@ -187,6 +188,8 @@ export function format(text: string) {
   return res.replaceAll("\n", "<br/>").replaceAll("```", "");
 }
 
+// 存储节点开始时间的对象
+let nodeData: Record<string, number> = {}
 const handleStream = (
   response: Response,
   onData: IOnData,
@@ -208,7 +211,8 @@ const handleStream = (
   onTextChunk?: IOnTextChunk,
   onTTSChunk?: IOnTTSChunk,
   onTTSEnd?: IOnTTSEnd,
-  onTextReplace?: IOnTextReplace
+  onTextReplace?: IOnTextReplace,
+  isView?: boolean, // 添加 isView 参数，默认为 false
 ) => {
   if (!response.ok) throw new Error("Network response was not ok");
 
@@ -227,108 +231,153 @@ const handleStream = (
       }
       buffer += decoder.decode(result.value, { stream: true });
       const lines = buffer.split("\n");
-      try {
-        lines.forEach((message) => {
-          if (message.startsWith("data:")) {
-            // check if it starts with data:
-            try {
-              bufferObj = JSON.parse(message.substring(5)) as Record<
-                string,
-                any
-              >; // remove data: and parse as json
-            } catch (e) {
-              // mute handle message cut off
-              onData("", isFirstMessage, {
-                conversationId: bufferObj?.conversation_id,
-                messageId: bufferObj?.message_id,
-              });
-              return;
-            }
-            if (bufferObj.status === 400 || !bufferObj.event) {
-              onData("", false, {
-                conversationId: undefined,
-                messageId: "",
-                errorMessage: bufferObj?.message,
-                errorCode: bufferObj?.code,
-              });
-              hasError = true;
-              onCompleted?.(true, bufferObj?.message);
-              return;
-            }
-            if (
-              bufferObj.event === "message" ||
-              bufferObj.event === "agent_message"
-            ) {
-              // can not use format here. Because message is splitted.
-              onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
-                conversationId: bufferObj.conversation_id,
-                taskId: bufferObj.task_id,
-                messageId: bufferObj.id,
-              });
-              isFirstMessage = false;
-            } else if (bufferObj.event === "agent_thought") {
-              onThought?.(bufferObj as ThoughtItem);
-            } else if (bufferObj.event === "message_file") {
-              onFile?.(bufferObj as VisionFile);
-            } else if (bufferObj.event === "message_end") {
-              onMessageEnd?.(bufferObj as MessageEnd);
-            } else if (bufferObj.event === "message_replace") {
-              onMessageReplace?.(bufferObj as MessageReplace);
-            } else if (bufferObj.event === "workflow_started") {
-              onWorkflowStarted?.(bufferObj as WorkflowStartedResponse);
-            } else if (bufferObj.event === "workflow_finished") {
-              onWorkflowFinished?.(bufferObj as WorkflowFinishedResponse);
-            } else if (bufferObj.event === "node_started") {
-              onNodeStarted?.(bufferObj as NodeStartedResponse);
-            } else if (bufferObj.event === "node_finished") {
-              onNodeFinished?.(bufferObj as NodeFinishedResponse);
-            } else if (bufferObj.event === "iteration_started") {
-              onIterationStart?.(bufferObj as IterationStartedResponse);
-            } else if (bufferObj.event === "iteration_next") {
-              onIterationNext?.(bufferObj as IterationNextResponse);
-            } else if (bufferObj.event === "iteration_completed") {
-              onIterationFinish?.(bufferObj as IterationFinishedResponse);
-            } else if (bufferObj.event === "node_retry") {
-              onNodeRetry?.(bufferObj as NodeFinishedResponse);
-            } else if (bufferObj.event === "parallel_branch_started") {
-              onParallelBranchStarted?.(
-                bufferObj as ParallelBranchStartedResponse
-              );
-            } else if (bufferObj.event === "parallel_branch_finished") {
-              onParallelBranchFinished?.(
-                bufferObj as ParallelBranchFinishedResponse
-              );
-            } else if (bufferObj.event === "text_chunk") {
-              onTextChunk?.(bufferObj as TextChunkResponse);
-            } else if (bufferObj.event === "text_replace") {
-              onTextReplace?.(bufferObj as TextReplaceResponse);
-            } else if (bufferObj.event === "tts_message") {
-              onTTSChunk?.(
-                bufferObj.message_id,
-                bufferObj.audio,
-                bufferObj.audio_type
-              );
-            } else if (bufferObj.event === "tts_message_end") {
-              onTTSEnd?.(bufferObj.message_id, bufferObj.audio);
-            }
+      // console.log('res解析后', lines)
+      // try {
+      const processLine = async (message: string) => {
+        if (message.startsWith("data:")) {
+          // check if it starts with data:
+          try {
+            bufferObj = JSON.parse(message.substring(5)) as Record<
+            string,
+            any
+            >; // remove data: and parse as json
+          } catch (e) {
+            // mute handle message cut off
+            onData("", isFirstMessage, {
+              conversationId: bufferObj?.conversation_id,
+              messageId: bufferObj?.message_id,
+            });
+            return;
           }
-        });
-        buffer = lines[lines.length - 1];
-      } catch (e) {
-        onData("", false, {
-          conversationId: undefined,
-          messageId: "",
-          errorMessage: `${e}`,
-        });
-        hasError = true;
-        onCompleted?.(true, e as string);
-        return;
+          if (bufferObj.status === 400 || !bufferObj.event) {
+            onData("", false, {
+              conversationId: undefined,
+              messageId: "",
+              errorMessage: bufferObj?.message,
+              errorCode: bufferObj?.code,
+            });
+            hasError = true;
+            onCompleted?.(true, bufferObj?.message);
+            return;
+          }
+
+          if (
+            bufferObj.event === "message" ||
+            bufferObj.event === "agent_message"
+          ) {
+            // can not use format here. Because message is splitted.
+            onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
+              conversationId: bufferObj.conversation_id,
+              taskId: bufferObj.task_id,
+              messageId: bufferObj.id,
+            });
+            isFirstMessage = false;
+          } else if (bufferObj.event === "agent_thought") {
+            onThought?.(bufferObj as ThoughtItem);
+          } else if (bufferObj.event === "message_file") {
+            onFile?.(bufferObj as VisionFile);
+          } else if (bufferObj.event === "message_end") {
+            onMessageEnd?.(bufferObj as MessageEnd);
+          } else if (bufferObj.event === "message_replace") {
+            onMessageReplace?.(bufferObj as MessageReplace);
+          } else if (bufferObj.event === "workflow_started") {
+            onWorkflowStarted?.(bufferObj as WorkflowStartedResponse);
+          } else if (bufferObj.event === "workflow_finished") {
+            onWorkflowFinished?.(bufferObj as WorkflowFinishedResponse);
+          } else if (bufferObj.event === "node_started") {
+            // 存储每个节点的node_started事件，当收到对应node_finished事件时，计算事件时间差，少于指定时间则延迟
+            // 只有当 isView 为 true 时才记录节点开始时间
+            if (isView && bufferObj.data?.node_id)
+              nodeData[bufferObj.data.node_id] = Date.now()
+
+            onNodeStarted?.(bufferObj as NodeStartedResponse);
+          } else if (bufferObj.event === "node_finished") {
+            // 只有当 isView 为 true 时才进行时间计算和延迟处理
+            if (isView) {
+              const nodeId = bufferObj.data?.node_id
+              const endTime = Date.now()
+
+              // 计算实际执行时间
+              let executionTime = 0
+              if (nodeId && nodeData[nodeId]) {
+                executionTime = (endTime - nodeData[nodeId]) / 1000 // 转换为秒
+                // 清除已记录的开始时间
+                delete nodeData[nodeId]
+              }
+
+              // 检查elapsed_time是否小于1.5秒，如果是则延迟执行
+              if (executionTime > 0 && executionTime < 1.5) {
+                // 计算需要延迟的时间（确保至少延迟到1.5秒）
+                const delay = (1.5 - executionTime) * 1000 // 转换为毫秒
+                // 使用Promise和setTimeout实现延迟
+                await new Promise(resolve => setTimeout(resolve, delay))
+                onNodeFinished?.(bufferObj as NodeFinishedResponse)
+              }
+              else {
+                // 正常执行
+                onNodeFinished?.(bufferObj as NodeFinishedResponse)
+              }
+            }
+            else {
+              onNodeFinished?.(bufferObj as NodeFinishedResponse) // 如果 isView 为 false，则直接执行回调
+            }
+          } else if (bufferObj.event === "iteration_started") {
+            onIterationStart?.(bufferObj as IterationStartedResponse);
+          } else if (bufferObj.event === "iteration_next") {
+            onIterationNext?.(bufferObj as IterationNextResponse);
+          } else if (bufferObj.event === "iteration_completed") {
+            onIterationFinish?.(bufferObj as IterationFinishedResponse);
+          } else if (bufferObj.event === "node_retry") {
+            onNodeRetry?.(bufferObj as NodeFinishedResponse);
+          } else if (bufferObj.event === "parallel_branch_started") {
+            onParallelBranchStarted?.(
+              bufferObj as ParallelBranchStartedResponse
+            );
+          } else if (bufferObj.event === "parallel_branch_finished") {
+            onParallelBranchFinished?.(
+              bufferObj as ParallelBranchFinishedResponse
+            );
+          } else if (bufferObj.event === "text_chunk") {
+            onTextChunk?.(bufferObj as TextChunkResponse);
+          } else if (bufferObj.event === "text_replace") {
+            onTextReplace?.(bufferObj as TextReplaceResponse);
+          } else if (bufferObj.event === "tts_message") {
+            onTTSChunk?.(
+              bufferObj.message_id,
+              bufferObj.audio,
+              bufferObj.audio_type
+            );
+          } else if (bufferObj.event === "tts_message_end") {
+            onTTSEnd?.(bufferObj.message_id, bufferObj.audio);
+          }
+        }
+      };
+        // 顺序处理所有行
+      const processLines = async () => {
+        try {
+          for (const message of lines)
+            await processLine(message)
+
+          buffer = lines[lines.length - 1]
+        }
+        catch (e) {
+          onData('', false, {
+            conversationId: undefined,
+            messageId: '',
+            errorMessage: `${e}`,
+          })
+          hasError = true
+          onCompleted?.(true, e as string);
+          return
+        }
+        if (!hasError)
+          read()
       }
-      if (!hasError) read();
-    });
+      processLines()
+    })
   }
-  read();
-};
+  read()
+}
 
 const baseFetch = <T>(
   url: string,
@@ -340,6 +389,7 @@ const baseFetch = <T>(
     deleteContentType,
     getAbortController,
     silent,
+    isView = false, // 添加 isView 参数
   }: IOtherOptions
 ): Promise<T> => {
   const options: typeof baseOptions & FetchOptionType = Object.assign(
@@ -568,7 +618,7 @@ export const upload = (
 export const ssePost = (
   url: string,
   fetchOptions: FetchOptionType,
-  otherOptions: IOtherOptions
+  otherOptions: IOtherOptions,
 ) => {
   const {
     isPublicAPI = false,
@@ -594,9 +644,9 @@ export const ssePost = (
     onTextReplace,
     onError,
     getAbortController,
+    isView,
   } = otherOptions;
   const abortController = new AbortController();
-
   const options = Object.assign(
     {},
     baseOptions,
@@ -651,7 +701,7 @@ export const ssePost = (
       if (curTenantId) options.headers.set("TenantId", curTenantId);
     }
   }
-
+  // console.log('请求接口了')
   globalThis
     .fetch(urlWithPrefix, options as RequestInit)
     .then((res) => {
@@ -685,6 +735,7 @@ export const ssePost = (
         }
         return;
       }
+      // console.log('接口放回了', res)
       return handleStream(
         res,
         (str: string, isFirstMessage: boolean, moreInfo: IOnDataMoreInfo) => {
@@ -722,7 +773,8 @@ export const ssePost = (
         onTextChunk,
         onTTSChunk,
         onTTSEnd,
-        onTextReplace
+        onTextReplace,
+        isView,
       );
     })
     .catch((e) => {  

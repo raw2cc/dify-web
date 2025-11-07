@@ -192,7 +192,7 @@ const Workflow: FC<WorkflowProps> = memo(({
       getting = true
       setTimeout(() => {
         listenFn()
-      }, 10000)
+      }, 2000)
     }
   }
 
