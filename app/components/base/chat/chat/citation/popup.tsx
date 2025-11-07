@@ -73,16 +73,6 @@ const Popup: FC<PopupProps> = ({
                             {source.segment_position || index + 1}
                           </div>
                         </div>
-                        {
-                          showHitInfo && (
-                            <Link
-                              href={`/datasets/${source.dataset_id}/documents/${source.document_id}`}
-                              className='hidden items-center h-[18px] text-xs text-primary-600 group-hover:flex'>
-                              {t('common.chat.citation.linkToDataset')}
-                              <ArrowUpRight className='ml-1 w-3 h-3' />
-                            </Link>
-                          )
-                        }
                       </div>
                       <div className='text-[13px] text-gray-800 break-words'>{source.content}</div>
                       {
