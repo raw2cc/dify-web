@@ -419,17 +419,18 @@ const RulesSelectModal: FC<RulesSelectModalProps> = ({
         </div>
 
         {/* 表格 */}
-        <div className="mb-1">
+        <div className="mb-1 h-[533px]">
           <Table
             loading={loading}
             rowKey="id"
             columns={columns}
             dataSource={tableData}
+            scroll={{ y: 430 }} // 设置垂直滚动高度
             pagination={{
               current: queryParams.pageNum,
               pageSize: queryParams.pageSize,
               total: queryParams.total,
-              showSizeChanger: false,
+              showSizeChanger: true,
               showQuickJumper: false,
               onChange: (page, pageSize) => {
                 handleTablePageChange(page, pageSize)
@@ -519,7 +520,7 @@ const RulesSelectModal: FC<RulesSelectModalProps> = ({
           className='!w-[600px]'
         >
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <div className="text-xl font-semibold text-gray-900">{t('appDebug.feature.moderation.modal.selectModal.deleteTitle')}</div>
+            <div className="text-xl font-semibold text-gray-900">{t('appDebug.feature.moderation.modal.selectModal.ruleDelete')}</div>
             <div className="p-1 cursor-pointer" onClick={() => {
               setDeleteVisible(false)
               setDeletingRule(null)

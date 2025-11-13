@@ -97,7 +97,7 @@ export const useWorkflowRun = () => {
       getNodes,
       setNodes,
     } = store.getState()
-
+    const { zoomTo } = reactflow
     const {
       setWorkflowRunningData,
       workflowRunningData,
@@ -131,7 +131,7 @@ export const useWorkflowRun = () => {
         node.data._runningStatus = undefined
       })
     })
-    !isView && setNodes(newNodes)
+    setNodes(newNodes)
     await doSyncWorkflowDraft()
 
     const {
@@ -207,6 +207,12 @@ export const useWorkflowRun = () => {
             setEdges,
           } = store.getState()
           if (isView) {
+            // debugger
+            // 使用 setTimeout 确保在下一个事件循环中执行
+            setTimeout(() => {
+              // 缩放调整为100%
+              zoomTo(0.75)
+            }, 0)
             setWorkflowRunningData({
               result: {
                 status: WorkflowRunningStatus.Running,
@@ -274,6 +280,9 @@ export const useWorkflowRun = () => {
 
           if (onWorkflowFinished)
             onWorkflowFinished(params)
+
+          // 缩放调整为100%
+          zoomTo(0.5)
         },
         onError: (params) => {
           // console.log('onError1', params)

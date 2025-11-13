@@ -1,9 +1,10 @@
 'use client'
 import type { FC } from 'react'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import {
   RiDeleteBinLine,
-  RiChatDeleteLine
+  RiChatDeleteLine,
+  RiTerminalBoxLine,
 } from '@remixicon/react'
 import copy from 'copy-to-clipboard'
 import { useTranslation } from 'react-i18next'
@@ -37,6 +38,7 @@ import CodeEditor from '@/app/components/workflow/nodes/_base/components/editor/
 import Switch from '@/app/components/base/switch'
 import { Jinja } from '@/app/components/base/icons/src/vender/workflow'
 import { useStore } from '@/app/components/workflow/store'
+import PromptSelectModal from '@/app/components/workflow/nodes/_base/components/prompt/select-prompt-template'
 
 type Props = {
   className?: string
@@ -116,6 +118,7 @@ const Editor: FC<Props> = ({
     editorExpandHeight,
   } = useToggleExpend({ ref, isInNode: true })
   const [isCopied, setIsCopied] = React.useState(false)
+  const [promptTemplateVisible, setPromptTemplateVisible] = useState(false)
   const handleCopy = useCallback(() => {
     copy(value)
     setIsCopied(true)
@@ -131,6 +134,19 @@ const Editor: FC<Props> = ({
     eventEmitter?.emit({ type: PROMPT_EDITOR_INSERT_QUICKLY, instanceId } as any)
   }
 
+  // 弹出提示词模板弹框
+  const onOpenPrompt = () => {
+    setPromptTemplateVisible(true)
+  }
+
+  // 使用模板
+  const onUseTemplate = (data: any) => {
+    setPromptTemplateVisible(false)
+    // console.log('onUseTemplate', title, nodeType, data)
+    if (data && data.promptContent)
+      onChange(data.promptContent)
+  }
+
   return (
     <Wrap className={cn(className, wrapClassName)} style={wrapStyle} isInNode isExpand={isExpand}>
       <div ref={ref} className={cn(nodeType !== 'llm' && (isFocus ? s.gradientBorder : 'bg-gray-100'), isExpand && 'h-full', '!rounded-[9px] p-0.5')}>
@@ -142,7 +158,11 @@ const Editor: FC<Props> = ({
               {isSupportPromptGenerator && (
                 <PromptGeneratorBtn className='ml-[5px]' onGenerated={onGenerated} modelConfig={modelConfig} />
               )}
-
+              <div className={cn(nodeType !== 'llm' && 'hidden')}>
+                <ActionButton onClick={onOpenPrompt}>
+                  <RiTerminalBoxLine className='w-4 h-4' />
+                </ActionButton>
+              </div>
               <div className='w-px h-3 ml-2 mr-2 bg-gray-200 hidden'></div>
               {/* Operations */}
               <div className='flex items-center space-x-[2px]'>
@@ -207,7 +227,7 @@ const Editor: FC<Props> = ({
               ? (
                 <div className={cn(isExpand ? 'grow' : 'max-h-[536px]', 'relative px-3 min-h-[56px]  overflow-y-auto',nodeType === 'llm' && 'pt-2')}>
                   <PromptEditor
-                    key={controlPromptEditorRerenderKey}
+                    key={`${controlPromptEditorRerenderKey}_${value ?? ''}`}
                     instanceId={instanceId}
                     compact
                     className='min-h-[56px]'
@@ -280,6 +300,12 @@ const Editor: FC<Props> = ({
           </div>
         </div>
       </div>
+      {promptTemplateVisible && (
+        <PromptSelectModal
+          onUseTemplate={onUseTemplate}
+          onCancel={() => setPromptTemplateVisible(false)}
+        />
+      )}
     </Wrap>
 
   )

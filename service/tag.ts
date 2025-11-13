@@ -45,3 +45,36 @@ export const unBindTag = (tagID: string, targetID: string, type: string) => {
     },
   })
 }
+
+// 获取标签列表
+export const getTagsApi = (params: any) => {
+  return get<Tag>('/tags', { params })
+}
+
+// 新增标签
+export const addTagsApi = (data: any) => {
+  return post<Tag>('/tags', {
+    body: data,
+  })
+}
+
+// 删除标签
+export const deleteTagApi = (data: any) => {
+  return post<Tag>('/tags/remove', {
+    body: data,
+  })
+}
+
+// 保存标签对应
+export const replaceTagApi = (data: any) => {
+  return post<Tag>('/tag-bindings/replace', {
+    body: data,
+  })
+}
+
+// 编辑标签
+export const editTagApi = (data: any) => {
+  return patch<Tag>(`/tags/${data.id}`, {
+    body: data,
+  })
+}

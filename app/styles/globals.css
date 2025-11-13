@@ -709,4 +709,7 @@ button:focus-within {
   .ant-table-pagination.ant-pagination{
     margin: 8px 0;
   }
+  .ant-table-body {
+    overflow-y: auto !important;
+  }
 }

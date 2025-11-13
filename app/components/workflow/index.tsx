@@ -222,10 +222,14 @@ const Workflow: FC<WorkflowProps> = memo(({
 
   const { handleRefreshWorkflowDraft } = useWorkflowUpdate()
   const handleSyncWorkflowDraftWhenPageClose = useCallback(() => {
-    if (document.visibilityState === 'hidden')
+    if (document.visibilityState === 'hidden') {
       syncWorkflowDraftWhenPageClose()
-    else if (document.visibilityState === 'visible')
+    }
+    else if (document.visibilityState === 'visible') {
+      if (isView)
+        return
       setTimeout(() => handleRefreshWorkflowDraft(), 500)
+    }
   }, [syncWorkflowDraftWhenPageClose, handleRefreshWorkflowDraft])
 
   useEffect(() => {
